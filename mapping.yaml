@@ -1,0 +1,35 @@
+# database: $DATAVAULT_DATABASE_URI
+table: az_tenders
+# or
+# query: ....
+nodes:
+  supplier:
+    label: Actor
+    properties:
+      actorName:
+        column: supplier
+      actorFingerprint:
+        column: supplier
+        transform: fingerprint
+        key: true
+  authority:
+    label: Actor
+    properties:
+      actorName:
+        column: authority
+      actorFingerprint:
+        column: authority
+        transform: fingerprint
+        key: true
+edges:
+  - type: AWARDS_CONTRACT
+    source: authority
+    target: supplier
+    properties:
+      contractAmount:
+        column: value
+      contractDescription:
+        column: description
+      linkId:
+        column: id
+        key: true
