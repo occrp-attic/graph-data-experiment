@@ -1,7 +1,5 @@
 database: $DATAVAULT_DATABASE_URI
 table: az_tenders
-# or
-# query: ....
 nodes:
   supplier:
     label: Actor

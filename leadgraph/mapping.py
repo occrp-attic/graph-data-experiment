@@ -18,22 +18,38 @@ class Mapping(object):
     def __init__(self, config):
         self.config = config
 
+    def get_env_config(self, name, env_name, default=None):
+        value = self.config.get(name)
+        if value is not None:
+            value = os.path.expandvars(value)
+        else:
+            value = os.environ.get(env_name, default)
+        if value is None:
+            raise LeadGraphException("Missing option: %s" % name)
+        return value
+
     @property
     def graph(self):
         """Instantiate the Neo4J graph connector."""
         if not hasattr(self, '_graph'):
-            self._graph = Graph(password='test')
-            self._graph.delete_all()
+            host = self.get_env_config('graph_host',
+                                       'NEO4J_HOST',
+                                       'localhost')
+            user = self.get_env_config('graph_user',
+                                       'NEO4J_USER',
+                                       'neo4j')
+            password = self.get_env_config('graph_password',
+                                           'NEO4J_PASSWORD',
+                                           'neo4j')
+            self._graph = Graph(host=host, user=user, password=password)
+            log.info('Destination: %r', self._graph)
         return self._graph
 
     @property
     def engine(self):
         """Instantiate the SQL database client."""
         if not hasattr(self, '_engine'):
-            database_uri = self.config.get('database')
-            if database_uri is not None:
-                database_uri = os.path.expandvars(database_uri)
-            database_uri = database_uri or os.environ.get('DATABASE_URI')
+            database_uri = self.get_env_config('database', 'DATABASE_URI')
             self._engine = create_engine(database_uri)
         return self._engine
 

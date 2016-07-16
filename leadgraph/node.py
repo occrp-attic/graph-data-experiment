@@ -19,6 +19,7 @@ class NodeMapping(ItemMapping):
     def update(self, graphtx, row):
         """Prepare and load a node."""
         props = self.bind_properties(row)
+        props['sourceId'] = self.mapping.config.get('id')
         keys = [k for k in self.keys if has_value(props.get(k))]
         if not len(keys):
             log.warning("No key for node: %r", row)
