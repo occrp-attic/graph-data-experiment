@@ -19,8 +19,8 @@ from sqlalchemy.schema import Table, Column, Index
 
 
 ## setup graph
-graph = Graph(password='test')
-graph.delete_all()
+# graph = Graph(password='test')
+# graph.delete_all()
 
 # Identifier = 'Identifier'
 # Actor = 'Actor'
@@ -57,6 +57,13 @@ class Mapping(object):
 
     def __init__(self, config):
         self.config = config
+
+    @property
+    def graph(self):
+        if not hasattr(self, '_graph'):
+            self._graph = Graph(password='test')
+            self._graph.delete_all()
+        return self._graph
 
     @property
     def engine(self):
@@ -102,26 +109,36 @@ class Mapping(object):
         return self._edges
 
     def load(self):
+        graphtx = self.graph.begin()
         rp = self.engine.execute(self.query)
         while True:
             rows = rp.fetchmany(10000)
             if not len(rows):
                 break
             for row in rows:
-                self.update(dict(row.items()))
+                self.update(graphtx, dict(row.items()))
+        graphtx.commit()
 
-    def update(self, row):
+    def update(self, graphtx, row):
         nodes = {}
         for node in self.nodes:
-            nodes[node.name] = node.update(row)
+            nodes[node.name] = node.update(graphtx, row)
         for edge in self.edges:
-            edge.update(row, nodes)
+            edge.update(graphtx, row, nodes)
 
     def __repr__(self):
         return unicode(self.query)
 
 
 class SubMapping(object):
+
+    def __init__(self, mapping, config):
+        self.mapping = mapping
+        self.config = config
+        self.label = config.get('label')
+        assert self.label is not None, "No label defined for node!"
+        self._keys = None
+        self._indices = None
 
     @property
     def properties(self):
@@ -139,20 +156,40 @@ class SubMapping(object):
                 props[prop.name] = value
         return props
 
+    @property
+    def keys(self):
+        if self._keys is None:
+            self._keys = []
+            for prop in self.properties:
+                if prop.key:
+                    self._keys.append(prop.name)
+        return self._keys
+
+    def _prepare_indices(self):
+        if self._indices is not None:
+            return
+        self._indices = self.mapping.graph.schema.get_indexes(self.label)
+        for key in self.keys:
+            if key not in self._indices:
+                self.mapping.graph.schema.create_index(self.label, key)
+        self._indices = True
+
+    def save(self, graphtx, subgraph, props):
+        self._prepare_indices()
+        keys = [k for k in self.keys if subgraph.get(k)]
+        graphtx.merge(subgraph, self.label, *keys)
+
 
 class NodeMapping(SubMapping):
 
     def __init__(self, mapping, name, config):
-        self.mapping = mapping
         self.name = name
-        self.config = config
-        self.label = config.get('label')
-        assert self.label is not None, "No label defined for node!"
+        super(NodeMapping, self).__init__(mapping, config)
 
-    def update(self, row):
+    def update(self, graphtx, row):
         props = self.bind_properties(row)
         node = Node(self.label, **props)
-        graph.create(node)
+        self.save(graphtx, node, props)
         return node
 
     def __repr__(self):
@@ -162,24 +199,26 @@ class NodeMapping(SubMapping):
 class EdgeMapping(SubMapping):
 
     def __init__(self, mapping, config):
-        self.mapping = mapping
-        self.config = config
-        self.type = config.get('type')
-        assert self.type is not None, "No type defined for edge!"
         self.source = config.get('source')
         assert self.source is not None, "No source defined for edge!"
         self.target = config.get('target')
         assert self.target is not None, "No target defined for edge!"
+        super(EdgeMapping, self).__init__(mapping, config)
 
-    def update(self, row, nodes):
+    def update(self, graphtx, row, nodes):
         props = self.bind_properties(row)
         source = nodes[self.source]
         target = nodes[self.target]
-        print source, target, props
+        if source is None or target is None:
+            print "Missing node", row
+            return
+        rel = Relationship(source, self.label, target, **props)
+        self.save(graphtx, rel, props)
+        # print source, target, props
 
     def __repr__(self):
         return '<EdgeMapping(%r, %r, %r)>' % \
-            (self.source, self.type, self.target)
+            (self.source, self.label, self.target)
 
 
 class Property(object):
@@ -189,11 +228,12 @@ class Property(object):
         self.name = name
         self.config = config
         self.column = config.get('column')
+        self.literal = config.get('literal')
         self.transform = config.get('transform', '').strip().lower()
         self.key = config.get('key', False)
 
     def bind(self, row):
-        value = row.get(self.column)
+        value = row.get(self.column, self.literal)
         if self.transform == 'fingerprint':
             value = fingerprints.generate(value)
         return value

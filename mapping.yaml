@@ -1,4 +1,4 @@
-# database: $DATAVAULT_DATABASE_URI
+database: $DATAVAULT_DATABASE_URI
 table: az_tenders
 # or
 # query: ....
@@ -8,21 +8,29 @@ nodes:
     properties:
       actorName:
         column: supplier
-      actorFingerprint:
+      fingerPrint:
         column: supplier
         transform: fingerprint
         key: true
+      isLegalEntity:
+        literal: true
   authority:
-    label: Actor
+    label: PublicBody
     properties:
       actorName:
         column: authority
-      actorFingerprint:
+      fingerPrint:
         column: authority
         transform: fingerprint
         key: true
+  country:
+    label: Country
+    properties:
+      countryCode:
+        literal: AZ
+        key: true
 edges:
-  - type: AWARDS_CONTRACT
+  - label: AWARDS_CONTRACT
     source: authority
     target: supplier
     properties:
@@ -30,6 +38,9 @@ edges:
         column: value
       contractDescription:
         column: description
-      linkId:
+      contractId:
         column: id
         key: true
+  - label: LOCATED_IN
+    source: authority
+    target: country
