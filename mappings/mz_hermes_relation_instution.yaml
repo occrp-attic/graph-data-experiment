@@ -1,0 +1,26 @@
+database: $DATAVAULT_DATABASE_URI
+query: >
+  SELECT * FROM mz_hermes_relation WHERE rel_key = 'socios_instituicoes';
+nodes:
+  company:
+    label: Actor
+    properties:
+      actorName:
+        column: source_name
+      fingerprint:
+        column: source_name
+        transform: fingerprint
+        key: true
+  organisation:
+    label: Actor
+    properties:
+      actorName:
+        column: target_name
+      fingerprint:
+        column: target_name
+        transform: fingerprint
+        key: true
+edges:
+  - label: RELATED_TO
+    source: organisation
+    target: company

@@ -6,7 +6,7 @@ nodes:
     properties:
       actorName:
         column: supplier
-      fingerPrint:
+      fingerprint:
         column: supplier
         transform: fingerprint
         key: true
@@ -17,7 +17,7 @@ nodes:
     properties:
       actorName:
         column: authority
-      fingerPrint:
+      fingerprint:
         column: authority
         transform: fingerprint
         key: true

@@ -1,0 +1,30 @@
+database: $DATAVAULT_DATABASE_URI
+table: zz_openoil_contractors
+nodes:
+  holder:
+    label: Actor
+    properties:
+      actorName:
+        column: contractor_single
+      fingerprint:
+        column: contractor_single
+        transform: fingerprint
+        key: true
+  concession:
+    label: Asset
+    properties:
+      assetName:
+        column: name
+      assetDescription:
+        column: description
+      fingerprint:
+        format: "%(source_url)s//%(name)s"
+        key: true
+edges:
+  - label: HAS_CONCESSION
+    source: holder
+    target: concession
+    properties:
+      sourceUrl:
+        column: source
+
