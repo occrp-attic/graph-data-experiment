@@ -1,17 +1,21 @@
 database: $DATAVAULT_DATABASE_URI
-query: SELECT * FROM zz_every_politician WHERE end_date IS NULL;
+query: SELECT * FROM zz_every_politician WHERE LENGTH(end_date) < 4;
 nodes:
   person:
     label: Actor
     properties:
       name:
-        column: parties
+        column: name
       fingerprint:
-        column: parties
+        column: name
         transform: fingerprint
         key: true
+      isPEP:
+        literal: true
       countryCode:
         column: country_code
+      gender:
+        column: gender
   legislature:
     label: PublicBody
     properties:
@@ -23,6 +27,8 @@ nodes:
         key: true
       countryCode:
         column: country_code
+      isParliament:
+        literal: true
   group:
     label: Actor
     properties:

@@ -1,31 +1,40 @@
-import six
-import fingerprints
+import logging
+
+from leadgraph.transforms import TRANSFORMS
+from leadgraph.util import LeadGraphException
+
+
+log = logging.getLogger(__name__)
 
 
 class Property(object):
     # Can apply either to a node or an edge.
 
-    def __init__(self, parent, name, config):
-        self.parent = parent
+    def __init__(self, item, name, config):
+        self.item = item
         self.name = name
         self.config = config
+        self.key = config.get('key', False)
         self.column = config.get('column')
         self.literal = config.get('literal')
         self.format = config.get('format')
-        self.transform = config.get('transform', '').strip().lower()
-        self.key = config.get('key', False)
+        self.country = config.get('country', self.item.country)
+        self.transforms = config.get('transforms', [])
+        if config.get('transform'):
+            self.transforms.append(config.get('transform'))
 
     def bind(self, row):
         value = row.get(self.column, self.literal)
         if self.format is not None:
             value = self.format % row
         if value is None:
-            return
-        if self.transform == 'fingerprint':
-            value = fingerprints.generate(value)
-        if self.transform == 'lowercase' and \
-                isinstance(value, six.string_types):
-            value = value.lower().strip()
+            return self.literal
+        for transform in self.transforms:
+            if transform not in TRANSFORMS:
+                raise LeadGraphException("No such transformer: %r" % transform)
+            value = TRANSFORMS[transform](value, row=row, prop=self)
+            if value is None:
+                break
         return value
 
     def __repr__(self):

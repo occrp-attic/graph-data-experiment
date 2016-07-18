@@ -98,7 +98,7 @@ class Mapping(object):
         # This is all wrapped in a transaction. Makes it faster,
         # but should the transaction be the full dataset?
         rp = self.engine.execute(self.query)
-        stats = defaultdict(int)
+        stats = {'rows': 0, 'nodes': 0, 'rels': 0}
         while True:
             graphtx = self.graph.begin()
             rows = rp.fetchmany(10000)

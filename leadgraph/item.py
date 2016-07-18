@@ -12,6 +12,7 @@ class ItemMapping(object):
         self.mapping = mapping
         self.config = config
         self.label = config.get('label')
+        self.country = config.get('country')
         if self.label is None:
             raise LeadGraphException("No label defined for node: %r!" % self)
 
