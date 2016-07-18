@@ -13,10 +13,14 @@ nodes:
         transform: fingerprint
         key: true
   property:
-    label: Asset
+    label: RealEstate
     properties:
       assetName:
         column: Title_Number
+      assetDescription:
+        column: Property_Address
+      assetType:
+        literal: "Real estate"
       fingerprint:
         column: Title_Number
         key: true

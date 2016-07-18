@@ -1,0 +1,42 @@
+database: $DATAVAULT_DATABASE_URI
+table: ss_exploration_licenses
+nodes:
+  holder:
+    label: Actor
+    properties:
+      actorName:
+        column: consortium
+      fingerprint:
+        column: consortium
+        transform: fingerprint
+        key: true
+  concession:
+    label: Concession
+    properties:
+      assetName:
+        column: epsa_name
+      assetDescription:
+        column: comments_1
+      concessionCommodities:
+        liter: 'Oil'
+      fingerprint:
+        format: "%(source_url)s//%(blk_id)s"
+        key: true
+  country:
+    label: Country
+    properties:
+      countryCode:
+        column: source_name
+        key: true
+edges:
+  - label: HAS_RIGHTS
+    source: holder
+    target: concession
+    properties:
+      rightStatus:
+        column: status
+      applicationDate:
+        column: transition
+  - label: LOCATED_IN
+    source: concession
+    target: country

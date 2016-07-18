@@ -11,7 +11,7 @@ nodes:
         transform: fingerprint
         key: true
   concession:
-    label: Asset
+    label: Concession
     properties:
       assetName:
         column: name
@@ -21,7 +21,7 @@ nodes:
         format: "%(source_url)s//%(name)s"
         key: true
 edges:
-  - label: HAS_CONCESSION
+  - label: HAS_RIGHTS
     source: holder
     target: concession
     properties:

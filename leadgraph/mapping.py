@@ -45,6 +45,10 @@ class Mapping(object):
             log.info('Destination: %r', self._graph)
         return self._graph
 
+    def clear(self):
+        log.info("Deleting existing data from graph...")
+        self.graph.delete_all()
+
     @property
     def engine(self):
         """Instantiate the SQL database client."""

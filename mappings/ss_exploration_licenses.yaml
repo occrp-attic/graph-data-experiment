@@ -1,5 +1,5 @@
 database: $DATAVAULT_DATABASE_URI
-table: ss_applications
+table: ss_exploration_licenses
 nodes:
   holder:
     label: Actor

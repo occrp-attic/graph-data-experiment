@@ -10,8 +10,10 @@ log = logging.getLogger(__name__)
 
 
 @click.command()
+@click.option('--clear', is_flag=True, default=False,
+              help='Clear the graph before loading.')
 @click.argument('mapping', type=click.File('rb'))
-def cli(mapping):
+def cli(clear, mapping):
     logging.basicConfig(level=logging.DEBUG,
                         format="[%(levelname)-8s] %(message)s")
     logging.getLogger('neo4j').setLevel(level=logging.WARNING)
@@ -22,6 +24,8 @@ def cli(mapping):
         config['id'] = base_name
     try:
         mapping = Mapping(config)
+        if clear:
+            mapping.clear()
         mapping.load()
     except LeadGraphException as lge:
         log.error(lge)
