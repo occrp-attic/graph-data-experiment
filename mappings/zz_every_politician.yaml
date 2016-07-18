@@ -1,0 +1,62 @@
+database: $DATAVAULT_DATABASE_URI
+query: SELECT * FROM zz_every_politician WHERE end_date IS NULL;
+nodes:
+  person:
+    label: Actor
+    properties:
+      name:
+        column: parties
+      fingerprint:
+        column: parties
+        transform: fingerprint
+        key: true
+      countryCode:
+        column: country_code
+  legislature:
+    label: PublicBody
+    properties:
+      name:
+        column: legislature_name
+      fingerprint:
+        format: "%(country_code)s:%(legislature_name)s"
+        transform: fingerprint
+        key: true
+      countryCode:
+        column: country_code
+  group:
+    label: Actor
+    properties:
+      name:
+        column: parties
+      fingerprint:
+        column: parties
+        transform: fingerprint
+        key: true
+      countryCode:
+        column: country_code
+  email:
+    label: Email
+    properties:
+      name:
+        column: email
+      fingerprint:
+        column: email
+        transform: email
+        key: true
+edges:
+  - label: MEMBER_OF
+    source: person
+    target: legislature
+    properties:
+      period:
+        column: period_name
+      term:
+        column: term
+      chamber:
+        column: chamber
+  - label: MEMBER_OF
+    source: person
+    target: group
+  - label: CONTACT_VIA
+    source: person
+    target: email

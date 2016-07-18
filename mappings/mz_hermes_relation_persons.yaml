@@ -5,7 +5,7 @@ nodes:
   company:
     label: Actor
     properties:
-      actorName:
+      name:
         column: source_name
       fingerprint:
         column: source_name
@@ -14,7 +14,7 @@ nodes:
   director:
     label: Actor
     properties:
-      actorName:
+      name:
         column: target_name
       fingerprint:
         column: target_name

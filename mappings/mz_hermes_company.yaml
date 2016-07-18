@@ -4,7 +4,7 @@ nodes:
   company:
     label: Actor
     properties:
-      actorName:
+      name:
         column: nome_da_entidade
       fingerprint:
         column: nome_da_entidade
@@ -16,13 +16,6 @@ nodes:
         literal: true
       isCompany:
         literal: true
-  country:
-    label: Country
-    properties:
       countryCode:
         literal: MZ
-        key: true
-edges:
-  - label: JURISDICTION
-    source: company
-    target: country
+edges: []

@@ -4,7 +4,7 @@ nodes:
   holder:
     label: Actor
     properties:
-      actorName:
+      name:
         column: consortium
       fingerprint:
         column: consortium
@@ -13,30 +13,23 @@ nodes:
   concession:
     label: Concession
     properties:
-      assetName:
+      name:
         column: epsa_name
-      assetDescription:
+      description:
         column: comments_1
-      concessionCommodities:
+      commodities:
         liter: 'Oil'
       fingerprint:
         format: "%(source_url)s//%(blk_id)s"
         key: true
-  country:
-    label: Country
-    properties:
       countryCode:
         column: source_name
-        key: true
 edges:
-  - label: HAS_RIGHTS
-    source: holder
-    target: concession
+  - label: OWNED_BY
+    source: concession
+    target: holder
     properties:
-      rightStatus:
+      status:
         column: status
       applicationDate:
         column: transition
-  - label: LOCATED_IN
-    source: concession
-    target: country

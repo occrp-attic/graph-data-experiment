@@ -4,7 +4,7 @@ nodes:
   supplier:
     label: Actor
     properties:
-      actorName:
+      name:
         column: supplier
       fingerprint:
         column: supplier
@@ -15,18 +15,14 @@ nodes:
   authority:
     label: PublicBody
     properties:
-      actorName:
+      name:
         column: authority
       fingerprint:
         column: authority
         transform: fingerprint
         key: true
-  country:
-    label: Country
-    properties:
       countryCode:
         literal: AZ
-        key: true
 edges:
   - label: AWARDS_CONTRACT
     source: authority
@@ -34,11 +30,8 @@ edges:
     properties:
       contractAmount:
         column: value
-      contractDescription:
+      description:
         column: description
       contractId:
         column: id
         key: true
-  - label: LOCATED_IN
-    source: authority
-    target: country

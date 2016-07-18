@@ -4,7 +4,7 @@ nodes:
   holder:
     label: Actor
     properties:
-      actorName:
+      name:
         column: contractor_single
       fingerprint:
         column: contractor_single
@@ -13,17 +13,17 @@ nodes:
   concession:
     label: Concession
     properties:
-      assetName:
+      name:
         column: name
-      assetDescription:
+      description:
         column: description
       fingerprint:
         format: "%(source_url)s//%(name)s"
         key: true
 edges:
-  - label: HAS_RIGHTS
-    source: holder
-    target: concession
+  - label: OWNED_BY
+    source: concession
+    target: holder
     properties:
       sourceUrl:
         column: source

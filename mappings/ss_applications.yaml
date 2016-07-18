@@ -4,7 +4,7 @@ nodes:
   holder:
     label: Actor
     properties:
-      actorName:
+      name:
         column: parties
       fingerprint:
         column: parties
@@ -13,36 +13,34 @@ nodes:
   concession:
     label: Concession
     properties:
-      assetName:
+      name:
         column: code
-      assetDescription:
+      description:
         column: name
-      concessionCommodities:
+      commodities:
         column: commodities
       concessionArea:
         column: area
       fingerprint:
         format: "%(source_url)s//%(code)s"
         key: true
+      countryCode:
+        literal: SS
   concessionLocation:
     label: Address
     properties:
-      address:
+      name:
         column: mapref
       fingerprint:
         column: mapref
         transform: fingerprint
         key: true
-  country:
-    label: Country
-    properties:
       countryCode:
-        column: source_name
-        key: true
+        literal: SS
 edges:
-  - label: HAS_RIGHTS
-    source: holder
-    target: concession
+  - label: OWNED_BY
+    source: concession
+    target: holder
     properties:
       rightType:
         column: type
@@ -55,9 +53,3 @@ edges:
   - label: LOCATED_AT
     source: concession
     target: concessionLocation
-  - label: LOCATED_IN
-    source: concession
-    target: country
-  - label: LOCATED_IN
-    source: concessionLocation
-    target: country

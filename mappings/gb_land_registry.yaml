@@ -6,7 +6,7 @@ nodes:
   proprietor:
     label: Actor
     properties:
-      actorName:
+      name:
         column: Proprietor_Name
       fingerprint:
         column: Proprietor_Name
@@ -15,38 +15,34 @@ nodes:
   property:
     label: RealEstate
     properties:
-      assetName:
+      name:
         column: Title_Number
-      assetDescription:
+      description:
         column: Property_Address
-      assetType:
-        literal: "Real estate"
       fingerprint:
         column: Title_Number
         key: true
+      countryCode:
+        literal: GB
   propertyAddress:
     label: Address
     properties:
-      address:
+      name:
         column: Property_Address
       fingerprint:
         column: Property_Address
-        transform: fingerprint
+        transform: addressfp
         key: true
+      countryCode:
+        literal: GB
   proprietorAddress:
     label: Address
     properties:
-      address:
+      name:
         column: Address_1
       fingerprint:
         column: Address_1
-        transform: fingerprint
-        key: true
-  country:
-    label: Country
-    properties:
-      countryCode:
-        literal: GB
+        transform: addressfp
         key: true
 edges:
   - label: OWNED_BY
@@ -67,9 +63,3 @@ edges:
     properties:
       tenure:
         column: Tenure
-  - label: LOCATED_IN
-    source: property
-    target: country
-  - label: LOCATED_IN
-    source: address
-    target: country
