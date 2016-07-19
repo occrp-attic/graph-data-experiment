@@ -34,7 +34,7 @@ setup(
         'six',
         'sqlalchemy',
         'psycopg2',
-        # 'flanker',
+        'flanker',
         'py2neo'
     ],
     tests_require=[],

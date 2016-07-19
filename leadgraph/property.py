@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, date
 
 from leadgraph.transforms import TRANSFORMS
 from leadgraph.util import LeadGraphException
@@ -35,6 +36,10 @@ class Property(object):
             value = TRANSFORMS[transform](value, row=row, prop=self)
             if value is None:
                 break
+        if isinstance(value, datetime):
+            value = value.date()
+        if isinstance(value, date):
+            value = value.isoformat()
         return value
 
     def __repr__(self):

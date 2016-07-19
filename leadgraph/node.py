@@ -22,7 +22,7 @@ class NodeMapping(ItemMapping):
         props['sourceId'] = self.mapping.config.get('id')
         keys = [k for k in self.keys if has_value(props.get(k))]
         if not len(keys):
-            log.warning("No key for node: %r", row)
+            # log.warning("No key for node: %r", row)
             return
         node = Node(self.label, **props)
         self.save(graphtx, node, props)

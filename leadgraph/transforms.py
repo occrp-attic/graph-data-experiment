@@ -5,7 +5,9 @@ from flanker.addresslib import address
 
 
 def fingerprint(value, **kwargs):
-    return fingerprints.generate(value)
+    value = fingerprints.generate(value)
+    if value is not None:
+        return value.replace(' ', '-')
 
 
 def trim(value, **kwargs):
@@ -21,7 +23,7 @@ def lowercase(value, **kwargs):
 
 
 def addressfp(value, **kwargs):
-    return fingerprint(value, **kwargs)
+    return fingerprints.generate(value, keep_order=True)
 
 
 def email(value, **kwargs):

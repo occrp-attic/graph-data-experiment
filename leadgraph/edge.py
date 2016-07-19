@@ -24,11 +24,11 @@ class EdgeMapping(ItemMapping):
         props = self.bind_properties(row)
         source = nodes.get(self.source)
         if source is None:
-            log.warning("No %r source node, skipping: %s", self.source, row)
+            # log.warning("No %r source node, skipping: %s", self.source, row)
             return
         target = nodes.get(self.target)
         if target is None:
-            log.warning("No %r target node, skipping: %s", self.target, row)
+            # log.warning("No %r target node, skipping: %s", self.target, row)
             return
         rel = Relationship(source, self.label, target, **props)
         self.save(graphtx, rel, props)
