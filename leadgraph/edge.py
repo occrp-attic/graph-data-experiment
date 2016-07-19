@@ -30,6 +30,7 @@ class EdgeMapping(ItemMapping):
         if target is None:
             # log.warning("No %r target node, skipping: %s", self.target, row)
             return
+        props['sourceId'] = self.mapping.config.get('id')
         rel = Relationship(source, self.label, target, **props)
         self.save(graphtx, rel, props)
         return rel
