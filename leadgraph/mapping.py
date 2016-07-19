@@ -102,17 +102,17 @@ class Mapping(object):
         rp = self.engine.execute(self.query)
         stats = {'rows': 0, 'nodes': 0, 'rels': 0}
         while True:
-            graphtx = self.graph.begin()
             rows = rp.fetchmany(10000)
             if not len(rows):
                 break
             for row in rows:
+                graphtx = self.graph.begin()
                 stats['rows'] += 1
                 self.update(graphtx, dict(row.items()), stats)
                 if stats['rows'] % 1000 == 0:
                     log.info("Loaded: %(rows)s [%(nodes)s nodes, "
                              "%(rels)s edges]", stats)
-            graphtx.commit()
+                graphtx.commit()
         log.info("Done. Loaded %(rows)s rows, %(nodes)s nodes, "
                  "%(rels)s edges.", stats)
 
