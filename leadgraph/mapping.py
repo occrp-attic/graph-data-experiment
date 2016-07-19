@@ -1,7 +1,7 @@
 import os
 import logging
 from py2neo import Graph
-from collections import defaultdict
+from sqlalchemy.sql import text as sql_text
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.schema import Table
 
@@ -72,6 +72,8 @@ class Mapping(object):
             table_name = self.config.get('table')
             table = Table(table_name, self.meta, autoload=True)
             query = table.select()
+        else:
+            query = sql_text(query)
         log.info("Query: %s", query)
         return query
 
