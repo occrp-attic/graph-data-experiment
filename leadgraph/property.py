@@ -19,6 +19,7 @@ class Property(object):
         self.column = config.get('column')
         self.literal = config.get('literal')
         self.format = config.get('format')
+        self.nulls = config.get('nulls', [])
         self.country = config.get('country', self.item.country)
         self.transforms = config.get('transforms', [])
         if config.get('transform'):
@@ -28,6 +29,8 @@ class Property(object):
         value = row.get(self.column, self.literal)
         if self.format is not None:
             value = self.format % row
+        if value in self.nulls:
+            return None
         if value is None:
             return self.literal
         for transform in self.transforms:
