@@ -1,7 +1,8 @@
 import os
 import logging
-from time import time
+from time import time, sleep
 from py2neo import Graph
+from py2neo.database.status import TransientError
 from sqlalchemy.sql import text as sql_text
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.schema import Table
@@ -105,8 +106,8 @@ class Mapping(object):
         rp = self.engine.execute(self.query)
         log.debug("Query time: %.5fms", (time() - begin_time) * 1000)
         stats = {'rows': 0, 'nodes': 0, 'rels': 0}
-        graphtx = self.graph.begin()
         while True:
+            graphtx = self.graph.begin()
             rows = rp.fetchmany(10000)
             if not len(rows):
                 break
@@ -115,29 +116,31 @@ class Mapping(object):
                 self.update(graphtx, dict(row.items()), stats)
 
                 if stats['rows'] % 1000 == 0:
-                    graphtx.commit()
-                    graphtx = self.graph.begin()
-
                     elapsed = (time() - begin_time)
                     stats['per_node'] = max(stats['nodes'], 1) / elapsed
                     log.info("Loaded: %(rows)s [%(nodes)s nodes, "
                              "%(rels)s edges], %(per_node).5f n/s", stats)
-
-        graphtx.commit()
+            graphtx.commit()
         log.info("Done. Loaded %(rows)s rows, %(nodes)s nodes, "
                  "%(rels)s edges.", stats)
 
     def update(self, graphtx, row, stats):
         """Generate nodes and edges for a single row."""
-        nodes = {}
-        for node in self.nodes:
-            nodes[node.name] = node.update(graphtx, row)
-            if nodes[node.name] is not None:
-                stats['nodes'] += 1
-        for edge in self.edges:
-            rel = edge.update(graphtx, row, nodes)
-            if rel is not None:
-                stats['rels'] += 1
+        while True:
+            try:
+                nodes = {}
+                for node in self.nodes:
+                    nodes[node.name] = node.update(graphtx, row)
+                    if nodes[node.name] is not None:
+                        stats['nodes'] += 1
+                for edge in self.edges:
+                    rel = edge.update(graphtx, row, nodes)
+                    if rel is not None:
+                        stats['rels'] += 1
+                return
+            except TransientError as te:
+                log.warning("Error: %r, retrying in 5s.", te)
+                sleep(5)
 
     def __repr__(self):
         return unicode(self.query)
