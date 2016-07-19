@@ -1,5 +1,6 @@
 import os
 import logging
+from time import time
 from py2neo import Graph
 from sqlalchemy.sql import text as sql_text
 from sqlalchemy import MetaData, create_engine
@@ -17,6 +18,7 @@ class Mapping(object):
 
     def __init__(self, config):
         self.config = config
+        self.id = config['id']
 
     def get_env_config(self, name, env_name, default=None):
         value = self.config.get(name)
@@ -99,20 +101,29 @@ class Mapping(object):
         """Generate query rows and load them into the graph."""
         # This is all wrapped in a transaction. Makes it faster,
         # but should the transaction be the full dataset?
+        begin_time = time()
         rp = self.engine.execute(self.query)
+        log.debug("Query time: %.5fms", (time() - begin_time) * 1000)
         stats = {'rows': 0, 'nodes': 0, 'rels': 0}
+        graphtx = self.graph.begin()
         while True:
             rows = rp.fetchmany(10000)
             if not len(rows):
                 break
             for row in rows:
-                graphtx = self.graph.begin()
                 stats['rows'] += 1
                 self.update(graphtx, dict(row.items()), stats)
+
                 if stats['rows'] % 1000 == 0:
+                    graphtx.commit()
+                    graphtx = self.graph.begin()
+
+                    elapsed = (time() - begin_time)
+                    stats['per_node'] = max(stats['nodes'], 1) / elapsed
                     log.info("Loaded: %(rows)s [%(nodes)s nodes, "
-                             "%(rels)s edges]", stats)
-                graphtx.commit()
+                             "%(rels)s edges], %(per_node).5f n/s", stats)
+
+        graphtx.commit()
         log.info("Done. Loaded %(rows)s rows, %(nodes)s nodes, "
                  "%(rels)s edges.", stats)
 
