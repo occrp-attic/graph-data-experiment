@@ -23,7 +23,15 @@ def lowercase(value, **kwargs):
 
 
 def addressfp(value, **kwargs):
-    return fingerprints.generate(value, keep_order=True)
+    try:
+        if value is None:
+            return
+        if not isinstance(value, unicode):
+            value = unicode(value)
+        value = value.replace('<br/>', ' ')
+        return fingerprints.generate(value, keep_order=True)
+    except Exception:
+        return
 
 
 def email(value, **kwargs):
@@ -35,6 +43,11 @@ def email(value, **kwargs):
 
 def phone(value, prop=None, **kwargs):
     try:
+        if value is None:
+            return
+        if not isinstance(value, unicode):
+            value = unicode(value)
+        value = value.strip()
         num = phonenumbers.parse(value, prop.country)
         if phonenumbers.is_possible_number(num):
             return phonenumbers.format_number(num, phonenumbers.PhoneNumberFormat.INTERNATIONAL)  # noqa
