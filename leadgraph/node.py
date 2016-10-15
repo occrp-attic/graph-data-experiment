@@ -18,6 +18,7 @@ class NodeMapping(ItemMapping):
 
     def update(self, graphtx, row):
         """Prepare and load a node."""
+        self._prepare_indices()
         props = self.bind_properties(row)
         props['sourceId'] = self.mapping.config.get('id')
         keys = [k for k in self.keys if has_value(props.get(k))]
@@ -27,6 +28,16 @@ class NodeMapping(ItemMapping):
         node = Node(self.label, **props)
         self.save(graphtx, node, props)
         return node
+
+    def _prepare_indices(self):
+        if hasattr(self, '_indices'):
+            return
+        self._indices = self.mapping.graph.schema.get_indexes(self.label)
+        for key in self.keys:
+            if key not in self._indices:
+                log.info("Creating index: %s -> %s", self.label, key)
+                self.mapping.graph.schema.create_index(self.label, key)
+        self._indices = True
 
     def __repr__(self):
         return '<NodeMapping(%r)>' % self.name

@@ -43,17 +43,6 @@ class ItemMapping(object):
                     self._keys.append(prop.name)
         return self._keys
 
-    def _prepare_indices(self):
-        if hasattr(self, '_indices'):
-            return
-        self._indices = self.mapping.graph.schema.get_indexes(self.label)
-        for key in self.keys:
-            if key not in self._indices:
-                log.info("Creating index: %s -> %s", self.label, key)
-                self.mapping.graph.schema.create_index(self.label, key)
-        self._indices = True
-
     def save(self, graphtx, subgraph, props):
-        self._prepare_indices()
         keys = [k for k in self.keys if subgraph.get(k)]
-        graphtx.merge(subgraph, self.label, *keys)
+        graphtx.merge(subgraph, self.label, tuple(keys))
