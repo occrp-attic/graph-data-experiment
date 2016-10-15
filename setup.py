@@ -28,16 +28,12 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     install_requires=[
-        'pyyaml',
-        'fingerprints',
-        'six',
-        'sqlalchemy',
-        'psycopg2',
-        'flanker'
+        'six'
     ],
     tests_require=[],
     entry_points={
         'console_scripts': [
+            'leadgraph = leadgraph.manage:main',
         ]
     }
 )

@@ -1,6 +1,4 @@
-import os
 import logging
-from urlparse import urljoin
 from flask import Flask, current_app
 from flask import url_for as flask_url_for
 from flask_mail import Mail
@@ -26,10 +24,6 @@ def get_config(name, default=None):
     return current_app.config.get(name, default)
 
 
-def get_app_url():
-    return urljoin(current_app.config.get('APP_BASEURL'), '/')
-
-
 def get_app_name():
     return current_app.config.get('APP_NAME', 'aleph')
 
@@ -48,7 +42,7 @@ def get_es():
 
 def get_es_index():
     app = current_app._get_current_object()
-    return app.config.get('ELASTICSEARCH_INDEX', app.config.get('APP_NAME'))
+    return app.config.get('ELASTICSEARCH_INDEX', get_app_name())
 
 
 def url_for(*a, **kw):

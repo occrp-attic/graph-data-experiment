@@ -1,8 +1,13 @@
+Flask==0.11.1
+Flask-Script==2.0.5
+Flask-Mail==0.9.1
 sqlalchemy
 psycopg2
-fingerprints
+https://github.com/pudo/fingerprints/tarball/master
 pyyaml
 cryptography
--U pip
+pip
 flanker
 phonenumbers
+elasticsearch==2.3.0
+unidecode
