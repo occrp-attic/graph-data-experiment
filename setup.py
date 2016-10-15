@@ -16,10 +16,10 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4'
     ],
-    keywords='neo4j graph etl data',
+    keywords='elasticsearch graph etl data',
     author='Friedrich Lindenberg',
-    author_email='friedrich@pudo.org',
-    url='http://github.com/pudo/leadgraph',
+    author_email='pudo@occrp.org',
+    url='http://github.com/occrp/leadgraph',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'test']),
     namespace_packages=[],
@@ -28,19 +28,16 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     install_requires=[
-        'click',
         'pyyaml',
         'fingerprints',
         'six',
         'sqlalchemy',
         'psycopg2',
-        'flanker',
-        'py2neo'
+        'flanker'
     ],
     tests_require=[],
     entry_points={
         'console_scripts': [
-            'leadgraph = leadgraph.cli:cli'
         ]
     }
 )

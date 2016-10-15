@@ -2,7 +2,6 @@ sqlalchemy
 psycopg2
 fingerprints
 pyyaml
-py2neo
 cryptography
 -U pip
 flanker
