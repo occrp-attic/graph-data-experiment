@@ -1,3 +1,5 @@
+from hashlib import sha1
+
 from leadgraph.mapper.schema import Schema
 from leadgraph.mapper.util import dict_list
 
@@ -17,12 +19,13 @@ class MapperProperty(object):
 
 class Mapper(object):
 
-    def __init__(self, source, data):
-        self.source = source
+    def __init__(self, dataset, data):
+        self.dataset = dataset
         self.data = data
         self.keys = dict_list(data, 'keys', 'key')
 
-        self.schema = source.model.get_schema(self.section, data.get('schema'))
+        model = dataset.model
+        self.schema = model.get_schema(self.section, data.get('schema'))
         if self.schema is None:
             raise TypeError("Invalid schema: %r" % data.get('schema'))
 
@@ -31,15 +34,30 @@ class Mapper(object):
             schema = self.schema.get(name)
             self.properties.append(MapperProperty(self, name, prop, schema))
 
-    def get_properties(self, record):
+    def compute_properties(self, record):
         return {p.name: p.get_value(record) for p in self.properties}
 
+    def compute_key(self, record):
+        if not len(self.keys):
+            return None
+        digest = sha1()
+        has_value = False
+        for key in self.keys:
+            value = record.get(key)
+            if value is not None:
+                value = unicode(value).encode('utf-8')
+                digest.update(value)
+                has_value = True
+        if has_value:
+            return digest.hexdigest()
+
     def to_index(self, record):
-        # TODO make sure record is typecast to strings
+        # TODO make sure record and properties is typecast to strings
         return {
             'schema': self.schema.name,
-            'source': self.source.name,
-            'properties': self.get_properties(record),
+            'dataset': self.dataset.name,
+            'properties': self.compute_properties(record),
+            'fingerprints': []
             # 'record': dict(record)
         }
 
@@ -47,28 +65,49 @@ class Mapper(object):
 class EntityMapper(Mapper):
     section = Schema.ENTITY
 
-    def __init__(self, source, name, data):
+    def __init__(self, dataset, name, data):
         self.name = name
-        super(EntityMapper, self).__init__(source, data)
+        super(EntityMapper, self).__init__(dataset, data)
+
+        if not len(self.keys):
+            raise TypeError("No key column(s) defined: %s" % name)
 
     def to_index(self, record):
         data = super(EntityMapper, self).to_index(record)
-        data['id'] = 'foo'
+        data['id'] = self.compute_key(record)
         return data
 
 
 class LinkMapper(Mapper):
     section = Schema.LINK
 
-    def __init__(self, source, data):
-        super(LinkMapper, self).__init__(source, data)
-        self.source = data.get('source')
-        self.target = data.get('target')
+    def __init__(self, dataset, data):
+        super(LinkMapper, self).__init__(dataset, data)
 
     def to_index(self, record, entities):
         data = super(LinkMapper, self).to_index(record)
-        source = entities.get(self.source)
-        target = entities.get(self.target)
-        if source is None or target is None:
-            return None
+
+        # Add entity references for start and end
+        data['entities'] = []
+        for part in ['source', 'target']:
+            name = self.data.get(part)
+            if name not in entities or entities[name] is None:
+                return None
+            entity = entities[name]
+            data[part] = {
+                'id': entity.get('id'),
+                'name': entity.get('name'),
+                'fingerprints': entity.get('fingerprints')
+            }
+            data['fingerprints'].extend(entity.get('fingerprints'))
+            data['entities'].append(entity.get('id'))
+
+        # Generate a link ID
+        digest = sha1()
+        key_digest = self.compute_key(record)
+        if key_digest is not None:
+            digest.update(key_digest)
+        for entity in data['entities']:
+            digest.update(entity)
+        data['id'] = digest.hexdigest()
         return data

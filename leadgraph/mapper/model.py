@@ -1,5 +1,5 @@
 from leadgraph.mapper.schema import Schema
-from leadgraph.mapper.source import Source
+from leadgraph.mapper.dataset import Dataset
 
 
 class Model(object):
@@ -12,9 +12,9 @@ class Model(object):
             for name, sconfig in data['schema'].get(section, {}).items():
                 self.schemata.append(Schema(section, name, sconfig))
 
-        self.sources = []
-        for name, sconfig in data.get('sources', {}).items():
-            self.sources.append(Source(self, name, sconfig))
+        self.datasets = []
+        for name, dconfig in data.get('datasets', {}).items():
+            self.datasets.append(Dataset(self, name, dconfig))
 
     def get_schema(self, section, name):
         for schema in self.schemata:
@@ -23,4 +23,4 @@ class Model(object):
         raise TypeError("No such schema for %s: %s" % (section, name))
 
     def __repr__(self):
-        return '<Model(%r, %r)>' % (self.schemata, self.sources)
+        return '<Model(%r, %r)>' % (self.schemata, self.datasets)

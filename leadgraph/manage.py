@@ -3,7 +3,7 @@ import logging
 from flask_script import Manager
 
 from leadgraph.core import create_app, model
-from leadgraph.index import index_source, init_search
+from leadgraph.index import index_dataset, init_search
 
 log = logging.getLogger(__name__)
 app = create_app()
@@ -12,8 +12,8 @@ manager = Manager(app)
 
 @manager.command
 def index():
-    for source in model.sources:
-        index_source(source)
+    for dataset in model.datasets:
+        index_dataset(dataset)
 
 
 @manager.command

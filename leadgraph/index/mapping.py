@@ -27,7 +27,7 @@ ENTITY_MAPPING = {
     "properties": {
         "name": {"type": "string", "index": "analyzed"},
         "schema": {"type": "string", "index": "not_analyzed"},
-        "source": {"type": "string", "index": "not_analyzed"},
+        "dataset": {"type": "string", "index": "not_analyzed"},
         "fingerprints": {"type": "string", "index": "not_analyzed"},
         "countries": {"type": "string", "index": "not_analyzed"},
         "record": {"type": "nested"},
@@ -62,7 +62,7 @@ LINK_MAPPING = {
     "date_detection": False,
     "properties": {
         "schema": {"type": "string", "index": "not_analyzed"},
-        "source": {"type": "string", "index": "not_analyzed"},
+        "dataset": {"type": "string", "index": "not_analyzed"},
         "fingerprints": {"type": "string", "index": "not_analyzed"},
         "entities": {"type": "string", "index": "not_analyzed"},
         "record": {"type": "nested"},

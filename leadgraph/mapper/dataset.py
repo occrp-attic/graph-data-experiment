@@ -11,11 +11,11 @@ from leadgraph.mapper.record import Record
 log = logging.getLogger(__name__)
 
 
-class SourceTable(object):
+class DatasetTable(object):
     """A table to be joined in."""
 
-    def __init__(self, source, data):
-        self.source = source
+    def __init__(self, dataset, data):
+        self.dataset = dataset
         if isinstance(data, six.string_types):
             data = {'table': data}
         self.data = data
@@ -37,7 +37,7 @@ class SourceTable(object):
         return '<ViewTable(%r,%r)>' % (self.alias_ref, self.table_ref)
 
 
-class SourceField(object):
+class DatasetField(object):
     """A field to be included in loaded data."""
 
     def __init__(self, model, view, data):
@@ -53,8 +53,8 @@ class SourceField(object):
         return '<ViewField(%r)>' % self.column_ref
 
 
-class Source(object):
-    """A source describes one set of data to be loaded."""
+class Dataset(object):
+    """A dataset describes one set of data to be loaded."""
 
     def __init__(self, model, name, data):
         self.model = model
@@ -62,8 +62,8 @@ class Source(object):
         self.label = data.get('label', name)
         self.data = data
         tables = data.get('tables', [data.get('table')])
-        self.tables = [SourceTable(self, f) for f in tables]
-        self.fields = [SourceField(self, f) for f in data.get('fields', [])]
+        self.tables = [DatasetTable(self, f) for f in tables]
+        self.fields = [DatasetField(self, f) for f in data.get('fields', [])]
 
         self.entities = []
         for ename, edata in data.get('entities').items():
@@ -115,4 +115,4 @@ class Source(object):
                 yield Record(self, row)
 
     def __repr__(self):
-        return '<Source(%r)>' % self.name
+        return '<Dataset(%r)>' % self.name

@@ -7,13 +7,15 @@ from leadgraph.util import DATA_PAGE
 log = logging.getLogger(__name__)
 
 
-def _source_iter(source):
+def _dataset_iter(dataset):
     row_idx = 1
     # TODO: make an LRU cache on (document IDs, doc_type)
-    for record in source.iterrecords():
+    for record in dataset.iterrecords():
         for (doc_type, doc) in record.iterindex(record):
             doc = dict(doc.items())
             doc_id = doc.pop('id', None)
+            if doc_id is None:
+                continue
             yield {
                 '_id': doc_id,
                 '_type': doc_type,
@@ -21,11 +23,11 @@ def _source_iter(source):
                 '_source': doc
             }
 
-            if row_idx % 10 == 0:
-                log.info("Index %r: %s", source, row_idx)
+            if row_idx % 10000 == 0:
+                log.info("Index %r: %s", dataset, row_idx)
             row_idx += 1
 
 
-def index_source(source):
-    bulk(es, _source_iter(source), stats_only=True,
+def index_dataset(dataset):
+    bulk(es, _dataset_iter(dataset), stats_only=True,
          chunk_size=DATA_PAGE, request_timeout=200.0)
