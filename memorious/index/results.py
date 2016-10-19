@@ -102,7 +102,7 @@ class ResultSet(object):
     def __iter__(self):
         for document in self.hits.get('hits', []):
             if document.get('_type') == Schema.ENTITY:
-                yield EntityResult(self, document)
+                yield EntityResult(document)
             else:
                 yield document
 

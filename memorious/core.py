@@ -3,6 +3,7 @@ from flask import Flask, current_app
 from flask import url_for as flask_url_for
 from flask_mail import Mail
 from flask_assets import Environment
+from flask_oauthlib.client import OAuth
 from werkzeug.local import LocalProxy
 from sqlalchemy import create_engine, MetaData
 from elasticsearch import Elasticsearch
@@ -14,6 +15,8 @@ log = logging.getLogger(__name__)
 
 mail = Mail()
 assets = Environment()
+oauth = OAuth()
+oauth_provider = oauth.remote_app('provider', app_key='OAUTH')
 
 
 def create_app(config={}):
@@ -23,6 +26,7 @@ def create_app(config={}):
     app.config.update(config)
     mail.init_app(app)
     assets.init_app(app)
+    oauth.init_app(app)
     return app
 
 
