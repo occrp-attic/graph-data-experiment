@@ -1,3 +1,5 @@
+import math
+
 from memorious.core import model
 from memorious.mapper.schema import Schema
 
@@ -29,12 +31,56 @@ class ResultSet(object):
         self.hits = results.get('hits', {})
         self.total = self.hits.get('total', 0)
 
+    @property
+    def pages(self):
+        if self.query.limit == 0:
+            return 1
+        return int(math.ceil(self.total / float(self.query.limit)))
+
+    @property
+    def has_next(self):
+        return self.query.page < self.pages
+
+    @property
+    def has_prev(self):
+        return self.query.page > 1
+
+    @property
+    def next_url(self):
+        if not self.has_next:
+            return ''
+        return self.query.make_page_url(self.query.page + 1)
+
+    @property
+    def prev_url(self):
+        if not self.has_prev:
+            return ''
+        return self.query.make_page_url(self.query.page - 1)
+
+    def pager(self, pager_range=8):
+        low = self.query.page - pager_range
+        high = self.query.page + pager_range
+
+        if low < 1:
+            low = 1
+            high = min((2 * pager_range) + 1, self.pages)
+
+        if high > self.pages:
+            high = self.pages
+            low = max(1, self.pages - (2 * pager_range) + 1)
+
+        for page in range(low, high + 1):
+            yield page, self.query.make_page_url(page), page == self.query.page
+
     def __iter__(self):
         for document in self.hits.get('hits', []):
             if document.get('_type') == Schema.ENTITY:
                 yield EntityResult(self, document)
             else:
                 yield document
+
+    def __len__(self):
+        return self.total
 
     def __repr__(self):
         return '<Result(%r)>' % (self.total)

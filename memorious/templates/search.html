@@ -10,11 +10,13 @@
       <table class="table table-condensed">
         {% for result in results %}
           <tr>
-            <td>{{result.properties.name}}</td>
             <td>{{result.schema.label}}</td>
+            <td>{{result.properties.name}}</td>
           </tr>
         {% endfor %}
       </table>
+
+      {{ macros.pager(results) }}
     </div>
   </div>
 {% endblock %}

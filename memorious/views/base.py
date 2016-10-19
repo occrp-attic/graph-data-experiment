@@ -14,6 +14,6 @@ def index():
 
 @blueprint.route('/search')
 def search():
-    query = Query(request.args)
+    query = Query(request.args, path=request.path)
     results = search_entities(query)
     return render_template("search.html", query=query, results=results)

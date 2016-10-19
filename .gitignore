@@ -4,3 +4,4 @@
 *.egg-info
 
 memorious/static/.webassets-cache/*
+memorious/static/assets/*
