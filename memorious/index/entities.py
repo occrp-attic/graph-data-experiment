@@ -5,6 +5,7 @@ from memorious.mapper.schema import Schema
 from memorious.index.results import ResultSet
 
 FACET_SIZE = 500
+FILTERS = ['schemata', 'dataset', 'countries']
 
 
 def search_entities(query):
@@ -20,6 +21,12 @@ def search_entities(query):
     else:
         q = {'match_all': {}}
 
+    must_filters = []
+    for field_filter in FILTERS:
+        values = query.getlist(field_filter)
+        if values:
+            must_filters.append({'terms': {field_filter: values}})
+
     aggregations = {}
     for facet in query.facets:
         aggregations.update({facet.field: {
@@ -33,8 +40,7 @@ def search_entities(query):
                 'query': q,
                 'filter': {
                     'bool': {
-                        'must': [],
-                        'should': []
+                        'must': must_filters
                     }
                 }
             }

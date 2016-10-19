@@ -53,7 +53,7 @@ class Query(object):
 
     def has_param(self, arg, value):
         value = unicode(value).encode('utf-8')
-        return (arg, value) in list(self.items())
+        return (arg, value) in list(self.items)
 
     def add_param(self, arg, value):
         items = list(self.items)
@@ -65,6 +65,11 @@ class Query(object):
         value = unicode(value).encode('utf-8')
         items = [t for t in self.items if t != (arg, value)]
         return self.make_url(items)
+
+    def toggle_param(self, arg, value):
+        if self.has_param(arg, value):
+            return self.remove_param(arg, value)
+        return self.add_param(arg, value)
 
     def make_url(self, params):
         if not len(params):
