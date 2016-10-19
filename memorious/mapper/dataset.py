@@ -3,10 +3,10 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.schema import Table
 
-from leadgraph.core import meta, engine
-from leadgraph.util import DATA_PAGE
-from leadgraph.mapper.mapper import EntityMapper, LinkMapper
-from leadgraph.mapper.record import Record
+from memorious.core import meta, engine
+from memorious.util import DATA_PAGE
+from memorious.mapper.mapper import EntityMapper, LinkMapper
+from memorious.mapper.record import Record
 
 log = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 import six
 
-from leadgraph.mapper.schema import Schema
+from memorious.mapper.schema import Schema
 
 
 class Record(dict):

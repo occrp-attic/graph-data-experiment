@@ -1,5 +1,5 @@
-from leadgraph.mapper.schema import Schema
-from leadgraph.mapper.dataset import Dataset
+from memorious.mapper.schema import Schema
+from memorious.mapper.dataset import Dataset
 
 
 class Model(object):

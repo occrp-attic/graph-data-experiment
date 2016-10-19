@@ -1,8 +1,8 @@
 from hashlib import sha1
 import fingerprints
 
-from leadgraph.mapper.schema import Schema
-from leadgraph.mapper.util import dict_list
+from memorious.mapper.schema import Schema
+from memorious.mapper.util import dict_list
 
 
 class MapperProperty(object):
@@ -67,7 +67,7 @@ class Mapper(object):
         # TODO make sure record and properties is typecast to strings
         return {
             'schema': self.schema.name,
-            'schemata': self.schemata,
+            'schemata': list(self.schema.schemata),
             'dataset': self.dataset.name,
             'properties': self.compute_properties(record),
             'fingerprints': [],

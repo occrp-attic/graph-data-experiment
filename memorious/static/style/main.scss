@@ -19,6 +19,11 @@ footer {
     a {
         color: $background-color;
         text-decoration: underline;
+
+        &:hover, &:active {
+            color: $background-color;
+            text-decoration: none;
+        }
     }
 }
 
@@ -29,6 +34,6 @@ footer {
     h1 {
         font-size: 1.2em;
         font-weight: 900;
-        margin-top: 0.7em;
+        margin-top: 0.6em;
     }
 }

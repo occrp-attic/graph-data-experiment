@@ -2,9 +2,9 @@
 import logging
 from flask_script import Manager
 
-from leadgraph.core import create_app, model
-from leadgraph.views import mount_app_blueprints
-from leadgraph.index import index_dataset, init_search
+from memorious.core import create_app, model
+from memorious.views import mount_app_blueprints
+from memorious.index import index_dataset, init_search
 
 log = logging.getLogger(__name__)
 app = create_app()

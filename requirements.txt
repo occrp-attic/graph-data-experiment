@@ -13,3 +13,4 @@ phonenumbers
 elasticsearch==2.3.0
 unidecode
 cssutils
+urllib3==1.17

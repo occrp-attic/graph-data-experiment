@@ -1,8 +1,8 @@
 import logging
 from elasticsearch.helpers import bulk
 
-from leadgraph.core import es, es_index
-from leadgraph.util import DATA_PAGE
+from memorious.core import es, es_index
+from memorious.util import DATA_PAGE
 
 log = logging.getLogger(__name__)
 

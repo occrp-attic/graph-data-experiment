@@ -1,4 +1,4 @@
-from leadgraph.mapper.util import dict_list
+from memorious.mapper.util import dict_list
 
 
 class SchemaProperty(object):
@@ -7,7 +7,6 @@ class SchemaProperty(object):
         self.schema = schema
         self.name = name
         self.data = data
-        self.is_hidden = data.get('hidden', False)
         self.is_label = data.get('label', False)
         self.is_fingerprint = data.get('fingerprint', False)
         self.is_fingerprint = self.is_label or self.is_fingerprint
@@ -27,6 +26,8 @@ class Schema(object):
         self.section = section
         self.name = name
         self.data = data
+        self.label = data.get('label', name)
+        self.is_hidden = data.get('hidden', False)
         self._extends = dict_list(data, 'extends')
         self._own_properties = []
         for name, prop in data.get('properties', {}).items():

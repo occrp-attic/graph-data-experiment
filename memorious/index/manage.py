@@ -1,8 +1,8 @@
 import logging
 
-from leadgraph.core import es, es_index
-from leadgraph.mapper.schema import Schema
-from leadgraph.index.mapping import LINK_MAPPING, ENTITY_MAPPING
+from memorious.core import es, es_index
+from memorious.mapper.schema import Schema
+from memorious.index.mapping import LINK_MAPPING, ENTITY_MAPPING
 
 log = logging.getLogger(__name__)
 

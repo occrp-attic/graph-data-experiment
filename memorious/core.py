@@ -7,8 +7,8 @@ from werkzeug.local import LocalProxy
 from sqlalchemy import create_engine, MetaData
 from elasticsearch import Elasticsearch
 
-from leadgraph import default_settings
-from leadgraph.util import load_config_file
+from memorious import default_settings
+from memorious.util import load_config_file
 
 log = logging.getLogger(__name__)
 
@@ -17,9 +17,9 @@ assets = Environment()
 
 
 def create_app(config={}):
-    app = Flask('leadgraph')
+    app = Flask('memorious')
     app.config.from_object(default_settings)
-    app.config.from_envvar('LEADGRAPH_SETTINGS', silent=True)
+    app.config.from_envvar('MEMORIOUS_SETTINGS', silent=True)
     app.config.update(config)
     mail.init_app(app)
     assets.init_app(app)
@@ -67,7 +67,7 @@ def get_metadata():
 def get_model():
     app = current_app._get_current_object()
     if not hasattr(app, '_lg_model'):
-        from leadgraph.mapper.model import Model
+        from memorious.mapper.model import Model
         model_config = get_config('MODEL_YAML', 'model.yaml')
         app._lg_model = Model(load_config_file(model_config))
     return app._lg_model

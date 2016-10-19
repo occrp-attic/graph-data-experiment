@@ -17,13 +17,15 @@
     {% assets "css" %}
       <link type="text/css" href="{{ ASSET_URL }}" rel="stylesheet">
     {% endassets %}
+    <link rel="shortcut icon" type="image/x-icon"
+      href="http://assets.pudo.org/img/favicon.ico">
 
     <base href="{{url_for('base.index')}}">
   </head>
   <body>
     <div id="page">
       <div class="container-fluid">
-        {% include "nav.html" %}
+        {% include "nav.html" with context %}
         {% block content %}{% endblock %}
       </div>
     </div>
@@ -33,9 +35,9 @@
         <div class="row">
           <div class="col-md-12">
             <p class="pull-right">
-              leadgraph &middot;
+              memorious &middot;
               <i class="fa fa-github-square"></i>
-              <a href="https://github.com/occrp/leadgraph">source code</a>
+              <a href="https://github.com/occrp/memorious">source code</a>
             </p>
           </div>
         </div>

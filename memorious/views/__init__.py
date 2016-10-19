@@ -1,5 +1,5 @@
-from leadgraph.views.assets import assets, compile_assets  # noqa
-from leadgraph.views.base import blueprint as base
+from memorious.views.assets import assets, compile_assets  # noqa
+from memorious.views.base import blueprint as base
 
 
 def mount_app_blueprints(app):

@@ -5,7 +5,8 @@
   </div>
   <div class="col-md-9">
     <form action="{{url_for('base.search')}}">
-      <input class="form-control" id="q" placeholder="Search all the data">
+      <input class="form-control" name="q" value="{{ query.text if query else '' }}"
+             placeholder="Search all the data">
     </form>
   </div>
 </div>
