@@ -19,3 +19,19 @@
     </ul>
   {% endif %}
 {% endmacro %}
+
+{% macro facet(query, facet) %}
+  <table class="table table-condensed">
+    <tr>
+      <th colspan="2">
+        {{facet.label}}
+      </th>
+    </tr>
+    {% for bucket in facet.buckets %}
+      <tr>
+        <td>{{bucket.label}}</td>
+        <td class="numeric">{{bucket.count}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endmacro %}

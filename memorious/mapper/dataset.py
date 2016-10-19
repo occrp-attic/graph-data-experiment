@@ -60,8 +60,10 @@ class Dataset(object):
     def __init__(self, model, name, data):
         self.model = model
         self.name = six.text_type(name)
-        self.label = data.get('label', name)
         self.data = data
+        self.meta = data.get('meta', {})
+        self.label = self.meta.get('label', name)
+
         tables = data.get('tables', [data.get('table')])
         self.tables = [DatasetTable(self, f) for f in tables]
         self.fields = [DatasetField(self, f) for f in data.get('fields', [])]
@@ -120,4 +122,4 @@ class Dataset(object):
                 yield Record(self, row)
 
     def __repr__(self):
-        return '<Dataset(%r)>' % self.name
+        return '<Dataset(%r, %r)>' % (self.name, self.label)

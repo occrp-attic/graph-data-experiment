@@ -23,12 +23,30 @@ class EntityResult(ResultDocument):
         self.name = self.data.get('name')
 
 
+class FacetBucket(object):
+
+    def __init__(self, facet, bucket):
+        self.facet = facet
+        self.key = bucket.get('key')
+        self.count = bucket.get('doc_count')
+
+    @property
+    def label(self):
+        if self.facet.label_func is None:
+            return self.key
+        return self.facet.label_func(self.key)
+
+    def __len__(self):
+        return self.count
+
+
 class ResultSet(object):
 
     def __init__(self, query, results):
         self.query = query
         self.results = results
         self.hits = results.get('hits', {})
+        self.aggregations = results.get('aggregations', {})
         self.total = self.hits.get('total', 0)
 
     @property
@@ -71,6 +89,16 @@ class ResultSet(object):
 
         for page in range(low, high + 1):
             yield page, self.query.make_page_url(page), page == self.query.page
+
+    @property
+    def facets(self):
+        for facet in self.query.facets:
+            data = self.aggregations.get(facet.field, {})
+            # This is a bit ugly, nailing the buckets onto the facet externally
+            facet.buckets = []
+            for bucket in data.get('buckets', []):
+                facet.buckets.append(FacetBucket(facet, bucket))
+            yield facet
 
     def __iter__(self):
         for document in self.hits.get('hits', []):

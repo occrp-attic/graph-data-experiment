@@ -2,6 +2,15 @@ from urllib import urlencode
 from werkzeug.datastructures import MultiDict
 
 
+class Facet(object):
+    """Describe a facet aggregation."""
+
+    def __init__(self, field, label, label_func=None):
+        self.field = field
+        self.label = label
+        self.label_func = label_func
+
+
 class Query(object):
     """Hold state for common query parameters."""
 
@@ -11,6 +20,7 @@ class Query(object):
         self.args = args
         self.path = path or ''
         self._limit = limit
+        self.facets = []
 
     @property
     def limit(self):
@@ -37,6 +47,9 @@ class Query(object):
         if self.text is None:
             return False
         return len(self.text.strip()) > 0
+
+    def add_facet(self, field, label, label_func=None):
+        self.facets.append(Facet(field, label, label_func=label_func))
 
     def has_param(self, arg, value):
         value = unicode(value).encode('utf-8')

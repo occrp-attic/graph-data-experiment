@@ -27,6 +27,12 @@ footer {
     }
 }
 
+.table {
+    tr.numeric, td.numeric {
+        text-align: right;
+    }
+}
+
 .main-nav {
     margin-top: 1em;
     margin-bottom: 1em;

@@ -4,7 +4,11 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-3"></div>
+    <div class="col-md-3">
+      {% for facet in results.facets %}
+        {{ macros.facet(query, facet) }}
+      {% endfor %}
+    </div>
     <div class="col-md-9">   
       {% if results.total == 0 %}
         <p>No results. Please try a wider search term.</p>

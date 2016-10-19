@@ -4,6 +4,8 @@ from memorious.core import es, es_index
 from memorious.mapper.schema import Schema
 from memorious.index.results import ResultSet
 
+FACET_SIZE = 500
+
 
 def search_entities(query):
     if query.has_text:
@@ -17,6 +19,12 @@ def search_entities(query):
         }
     else:
         q = {'match_all': {}}
+
+    aggregations = {}
+    for facet in query.facets:
+        aggregations.update({facet.field: {
+            'terms': {'field': facet.field, 'size': FACET_SIZE}}
+        })
 
     q = {
         'sort': ['_score'],
@@ -33,7 +41,7 @@ def search_entities(query):
         },
         'size': query.limit,
         'from': query.offset,
-        'aggregations': {}
+        'aggregations': aggregations
     }
 
     import json
