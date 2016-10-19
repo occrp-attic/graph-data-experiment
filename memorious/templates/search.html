@@ -18,7 +18,9 @@
             <tr>
               <td>{{result.schema.label}}</td>
               <td>
-                <a href="{{url_for('base.entity', id=result.id)}}">{{result.properties.name}}</a>
+                <a href="{{url_for('base.entity', entity_id=result.id)}}">
+                  {{result.properties.name}}
+                </a>
               </td>
             </tr>
           {% endfor %}

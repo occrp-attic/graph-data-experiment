@@ -1,7 +1,8 @@
 import logging
+from werkzeug.exceptions import NotFound
 from flask import render_template, Blueprint, request
 
-from memorious.index import search_entities, Query
+from memorious.index import search_entities, load_entity, Query
 from memorious.views.util import dataset_label, entity_schema_label
 
 blueprint = Blueprint('base', __name__)
@@ -22,7 +23,9 @@ def search():
     return render_template("search.html", query=query, results=results)
 
 
-@blueprint.route('/entities/<id>')
-def entity(id):
-    entity = {'name': 'Hello, world!'}
+@blueprint.route('/entities/<entity_id>')
+def entity(entity_id):
+    entity = load_entity(entity_id)
+    if entity is None:
+        raise NotFound()
     return render_template("entity.html", entity=entity)

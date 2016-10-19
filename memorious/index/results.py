@@ -6,8 +6,7 @@ from memorious.mapper.schema import Schema
 
 class ResultDocument(object):
 
-    def __init__(self, result_set, document):
-        self.result_set = result_set
+    def __init__(self, document):
         self.document = document
         self.data = document.get('_source')
         self.id = document.get('_id')
@@ -18,8 +17,8 @@ class ResultDocument(object):
 
 class EntityResult(ResultDocument):
 
-    def __init__(self, result_set, document):
-        super(EntityResult, self).__init__(result_set, document)
+    def __init__(self, document):
+        super(EntityResult, self).__init__(document)
         self.name = self.data.get('name')
 
 
