@@ -1,4 +1,5 @@
 from hashlib import sha1
+import fingerprints
 
 from leadgraph.mapper.schema import Schema
 from leadgraph.mapper.util import dict_list
@@ -11,10 +12,13 @@ class MapperProperty(object):
         self.name = name
         self.data = data
         self.schema = schema
-        self.ref = data.get('column')
+        self.refs = dict_list(data, 'column', 'columns')
 
     def get_value(self, record):
-        return record.get(self.ref)
+        return record.get(self.refs[0])
+
+    def get_fingerprint(self, record):
+        return fingerprints.generate(self.get_value(record))
 
 
 class Mapper(object):
@@ -33,6 +37,14 @@ class Mapper(object):
         for name, prop in data.get('properties', {}).items():
             schema = self.schema.get(name)
             self.properties.append(MapperProperty(self, name, prop, schema))
+
+    @property
+    def refs(self):
+        for key in self.keys:
+            yield key
+        for prop in self.properties:
+            for ref in prop.refs:
+                yield ref
 
     def compute_properties(self, record):
         return {p.name: p.get_value(record) for p in self.properties}
@@ -55,9 +67,11 @@ class Mapper(object):
         # TODO make sure record and properties is typecast to strings
         return {
             'schema': self.schema.name,
+            'schemata': self.schemata,
             'dataset': self.dataset.name,
             'properties': self.compute_properties(record),
-            'fingerprints': []
+            'fingerprints': [],
+            'text': record.text,
             # 'record': dict(record)
         }
 
@@ -74,7 +88,19 @@ class EntityMapper(Mapper):
 
     def to_index(self, record):
         data = super(EntityMapper, self).to_index(record)
+        values = data['properties']
         data['id'] = self.compute_key(record)
+
+        for prop in self.properties:
+            # Find an set the name property
+            if prop.schema.is_label:
+                data['name'] = values.get(prop.name)
+
+            # Add fingerprinted properties.
+            if prop.schema.is_fingerprint:
+                fp = prop.get_fingerprint(record)
+                if fp is not None:
+                    data['fingerprints'].append(fp)
         return data
 
 

@@ -10,7 +10,7 @@ class Model(object):
         self.schemata = []
         for section in Schema.SECTIONS:
             for name, sconfig in data['schema'].get(section, {}).items():
-                self.schemata.append(Schema(section, name, sconfig))
+                self.schemata.append(Schema(self, section, name, sconfig))
 
         self.datasets = []
         for name, dconfig in data.get('datasets', {}).items():

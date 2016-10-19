@@ -16,6 +16,10 @@ def _dataset_iter(dataset):
             doc_id = doc.pop('id', None)
             if doc_id is None:
                 continue
+
+            # from pprint import pprint
+            # pprint(doc)
+
             yield {
                 '_id': doc_id,
                 '_type': doc_type,

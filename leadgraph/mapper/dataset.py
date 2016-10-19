@@ -31,6 +31,7 @@ class DatasetTable(object):
             for column in self.alias.columns:
                 name = '%s.%s' % (self.alias_ref, column.name)
                 self._refs[name] = column
+                self._refs[column.name] = column
         return self._refs
 
     def __repr__(self):
@@ -89,6 +90,14 @@ class Dataset(object):
     def from_clause(self):
         return [t.alias for t in self.tables]
 
+    @property
+    def mapped_columns(self):
+        refs = set()
+        for item in self.entities + self.links:
+            for ref in item.refs:
+                refs.add(ref)
+        return [self.get_column(r) for r in refs]
+
     def apply_filters(self, q):
         for col, val in self.data.get('filters', {}).items():
             q = q.where(self.get_column(col) == val)
@@ -99,11 +108,7 @@ class Dataset(object):
         return q
 
     def iterrecords(self):
-        columns = []
-        # TODO: figure out which columns are actually needed.
-        for table in self.from_clause:
-            columns.extend(list(table.c))
-        q = select(columns=columns, from_obj=self.from_clause)
+        q = select(columns=self.mapped_columns, from_obj=self.from_clause)
         q = self.apply_filters(q)
         log.info("Query [%s]: %s", self.name, q)
         rp = engine.execute(q)

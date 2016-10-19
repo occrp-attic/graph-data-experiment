@@ -9,7 +9,7 @@ ENTITY_MAPPING = {
                 "match": "record.*",
                 "mapping": {
                     "type": "string",
-                    "index": "not_analyzed"
+                    "index": "analyzed"
                 }
             }
         },
@@ -18,7 +18,7 @@ ENTITY_MAPPING = {
                 "match": "properties.*",
                 "mapping": {
                     "type": "string",
-                    "index": "not_analyzed"
+                    "index": "analyzed"
                 }
             }
         }
@@ -27,7 +27,9 @@ ENTITY_MAPPING = {
     "properties": {
         "name": {"type": "string", "index": "analyzed"},
         "schema": {"type": "string", "index": "not_analyzed"},
+        "schemata": {"type": "string", "index": "not_analyzed"},
         "dataset": {"type": "string", "index": "not_analyzed"},
+        "text": {"type": "string", "index": "analyzed"},
         "fingerprints": {"type": "string", "index": "not_analyzed"},
         "countries": {"type": "string", "index": "not_analyzed"},
         "record": {"type": "nested"},
@@ -62,13 +64,15 @@ LINK_MAPPING = {
     "date_detection": False,
     "properties": {
         "schema": {"type": "string", "index": "not_analyzed"},
+        "schemata": {"type": "string", "index": "not_analyzed"},
         "dataset": {"type": "string", "index": "not_analyzed"},
+        "text": {"type": "string", "index": "analyzed"},
         "fingerprints": {"type": "string", "index": "not_analyzed"},
         "entities": {"type": "string", "index": "not_analyzed"},
         "record": {"type": "nested"},
         "properties": {"type": "nested"},
         "source": {
-            "type": "nested",
+            "type": "object",
             "properties": {
                 "id": {"type": "string", "index": "not_analyzed"},
                 "fingerprints": {"type": "string", "index": "not_analyzed"},
@@ -76,7 +80,7 @@ LINK_MAPPING = {
             }
         },
         "target": {
-            "type": "nested",
+            "type": "object",
             "properties": {
                 "id": {"type": "string", "index": "not_analyzed"},
                 "fingerprints": {"type": "string", "index": "not_analyzed"},
