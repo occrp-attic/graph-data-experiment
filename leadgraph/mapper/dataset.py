@@ -35,7 +35,7 @@ class DatasetTable(object):
         return self._refs
 
     def __repr__(self):
-        return '<ViewTable(%r,%r)>' % (self.alias_ref, self.table_ref)
+        return '<DatasetTable(%r,%r)>' % (self.alias_ref, self.table_ref)
 
 
 class DatasetField(object):
@@ -51,7 +51,7 @@ class DatasetField(object):
         self.table = view.get_table(self.column_ref)
 
     def __repr__(self):
-        return '<ViewField(%r)>' % self.column_ref
+        return '<DatasetField(%r)>' % self.column_ref
 
 
 class Dataset(object):

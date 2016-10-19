@@ -3,7 +3,7 @@ import os
 DEBUG = True
 
 APP_NAME = 'leadgraph'
-APP_TITLE = 'ID Entities'
+APP_TITLE = 'leadgraph'
 
 DATABASE_URL = os.environ.get('DATABASE_URI')
 ELASTICSEARCH_URL = 'http://localhost:9200/'

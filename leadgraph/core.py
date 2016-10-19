@@ -2,6 +2,7 @@ import logging
 from flask import Flask, current_app
 from flask import url_for as flask_url_for
 from flask_mail import Mail
+from flask_assets import Environment
 from werkzeug.local import LocalProxy
 from sqlalchemy import create_engine, MetaData
 from elasticsearch import Elasticsearch
@@ -12,6 +13,7 @@ from leadgraph.util import load_config_file
 log = logging.getLogger(__name__)
 
 mail = Mail()
+assets = Environment()
 
 
 def create_app(config={}):
@@ -20,6 +22,7 @@ def create_app(config={}):
     app.config.from_envvar('LEADGRAPH_SETTINGS', silent=True)
     app.config.update(config)
     mail.init_app(app)
+    assets.init_app(app)
     return app
 
 
