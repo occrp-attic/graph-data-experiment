@@ -1,6 +1,6 @@
 from flask_assets import Bundle
 
-from leadgraph.core import assets
+from memorious.core import assets
 
 css_assets = Bundle(
     'style/main.scss',

@@ -3,4 +3,4 @@
 .DS_Store
 *.egg-info
 
-leadgraph/static/.webassets-cache/*
+memorious/static/.webassets-cache/*

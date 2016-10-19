@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='leadgraph',
+    name='memorious',
     version='0.1',
     description="A data cross-referencing tool.",
     long_description="",
@@ -19,7 +19,7 @@ setup(
     keywords='elasticsearch graph etl data',
     author='Friedrich Lindenberg',
     author_email='pudo@occrp.org',
-    url='http://github.com/occrp/leadgraph',
+    url='http://github.com/occrp/memorious',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'test']),
     namespace_packages=[],
@@ -33,7 +33,7 @@ setup(
     tests_require=[],
     entry_points={
         'console_scripts': [
-            'leadgraph = leadgraph.manage:main',
+            'memorious = memorious.manage:main',
         ]
     }
 )
