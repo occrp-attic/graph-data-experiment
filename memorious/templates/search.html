@@ -5,17 +5,21 @@
 {% block content %}
   <div class="row">
     <div class="col-md-3"></div>
-    <div class="col-md-9">
-      A search was executed. {{ results.total }} results are cleverly hidden.
-      <table class="table table-condensed">
-        {% for result in results %}
-          <tr>
-            <td>{{result.schema.label}}</td>
-            <td>{{result.properties.name}}</td>
-          </tr>
-        {% endfor %}
-      </table>
-
+    <div class="col-md-9">   
+      {% if results.total == 0 %}
+        <p>No results. Please try a wider search term.</p>
+      {% else %}
+        <table class="table table-condensed">
+          {% for result in results %}
+            <tr>
+              <td>{{result.schema.label}}</td>
+              <td>
+                <a href="{{url_for('base.entity', id=result.id)}}">{{result.properties.name}}</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
       {{ macros.pager(results) }}
     </div>
   </div>

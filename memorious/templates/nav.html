@@ -7,6 +7,13 @@
     <form action="{{url_for('base.search')}}">
       <input class="form-control" name="q" value="{{ query.text if query else '' }}"
              placeholder="Search all the data">
+      {% if query is defined %}
+        {% for arg, value in query.items %}
+          {% if arg != 'q' %}
+            <input type="hidden" name="{{arg}}" value="{{value}}">
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     </form>
   </div>
 </div>

@@ -52,7 +52,8 @@ class Mapper(object):
     def compute_key(self, record):
         if not len(self.keys):
             return None
-        digest = sha1()
+        digest = sha1(self.dataset.name.encode('utf-8'))
+        # digest.update(self.schema.name.encode('utf-8'))
         has_value = False
         for key in self.keys:
             value = record.get(key)

@@ -1,19 +1,21 @@
 {% macro pager(results) %}
-  <ul class="pagination">
-    <li class="{% if not results.has_prev %}disabled{% endif%}">
-      <a href="{{results.prev_url}}" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
-    {% for page, url, active in results.pager() %}
-      <li class="{% if active %}active{% endif%}">
-        <a href="{{url}}">{{page}}</a>
+  {% if results.pages > 1 %}
+    <ul class="pagination">
+      <li class="{% if not results.has_prev %}disabled{% endif%}">
+        <a href="{{results.prev_url}}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
       </li>
-    {% endfor %}
-    <li class="{% if not results.has_next %}disabled{% endif%}">
-      <a href="{{results.next_url}}" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-  </ul>
+      {% for page, url, active in results.pager() %}
+        <li class="{% if active %}active{% endif%}">
+          <a href="{{url}}">{{page}}</a>
+        </li>
+      {% endfor %}
+      <li class="{% if not results.has_next %}disabled{% endif%}">
+        <a href="{{results.next_url}}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  {% endif %}
 {% endmacro %}
