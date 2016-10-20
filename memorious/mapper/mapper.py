@@ -1,4 +1,7 @@
+import re
+import six
 from hashlib import sha1
+from pybars import Compiler
 import fingerprints
 
 from memorious.mapper.schema import Schema
@@ -6,19 +9,43 @@ from memorious.mapper.util import dict_list
 
 
 class MapperProperty(object):
+    FORMAT_PATTERN = re.compile('{{([^(}})]*)}}')
+    compiler = Compiler()
 
     def __init__(self, mapper, name, data, schema):
         self.mapper = mapper
         self.name = name
         self.data = data
         self.schema = schema
+        self.type_name = data.get('type')
         self.refs = dict_list(data, 'column', 'columns')
+        self.literal = data.get('literal')
+
+        # this is hacky, trying to generate refs from template
+        self.format = data.get('format')
+        if self.format is not None:
+            for ref in self.FORMAT_PATTERN.findall(self.format):
+                self.refs.append(ref)
+            self.template = self.compiler.compile(six.text_type(self.format))
+
+    def get_values(self, record):
+        if self.literal is not None:
+            return [self.literal]
+        if self.format is not None:
+            return [self.template(record)]
+        return [record.get(r) for r in self.refs]
 
     def get_value(self, record):
-        return record.get(self.refs[0])
+        # collate value by default
+        for value in self.get_values(record):
+            if value is not None:
+                return value
 
-    def get_fingerprint(self, record):
-        return fingerprints.generate(self.get_value(record))
+    def get_fingerprints(self, record):
+        for value in self.get_values(record):
+            fp = fingerprints.generate(value)
+            if fp is not None:
+                yield fp
 
 
 class Mapper(object):
@@ -99,9 +126,7 @@ class EntityMapper(Mapper):
 
             # Add fingerprinted properties.
             if prop.schema.is_fingerprint:
-                fp = prop.get_fingerprint(record)
-                if fp is not None:
-                    data['fingerprints'].append(fp)
+                data['fingerprints'].extend(prop.get_fingerprints(record))
         return data
 
 

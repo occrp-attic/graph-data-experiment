@@ -23,7 +23,7 @@ emporium - table metadata layer
 * Entity overlap collector
 * Entity profile page
 * Entity links
-* OAuth login
+* [done] OAuth login
 * Type parser framework
 * Country fields
 * Address fields
