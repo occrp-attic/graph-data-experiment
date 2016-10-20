@@ -1,0 +1,23 @@
+<footer>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6">
+        <p>
+          {% if session.user %}
+            logged in as {{session.user}} &middot;
+            <a href="{{ url_for('auth.logout') }}">logout</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}?next={{ request.full_path | urlencode }}">login</a>
+          {% endif %}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p class="pull-right">
+          memorious &middot;
+          <i class="fa fa-github-square"></i>
+          <a href="https://github.com/occrp/memorious">source code</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
