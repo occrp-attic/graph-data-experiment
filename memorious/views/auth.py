@@ -3,8 +3,9 @@ from flask import session, Blueprint, redirect, request
 from flask_oauthlib.client import OAuthException
 from werkzeug.exceptions import Unauthorized
 
-from memorious.core import url_for, oauth_provider
+from memorious.core import url_for, oauth_provider, model
 from memorious.views.util import is_safe_url
+from memorious.mapper.auth import Auth
 
 
 log = logging.getLogger(__name__)
@@ -20,7 +21,8 @@ def get_oauth_token():
 
 @blueprint.before_app_request
 def prepare_auth():
-    print session.get('user')
+    request.auth = Auth(session.get('user'), model)
+    print request.auth
 
 
 @blueprint.route('/login')

@@ -6,6 +6,7 @@ Flask-OAuthlib==0.9.3
 sqlalchemy
 psycopg2
 https://github.com/pudo/fingerprints/tarball/master
+https://github.com/occrp/countrynames/tarball/master
 pyyaml
 cryptography
 pip
@@ -17,3 +18,4 @@ cssutils
 urllib3==1.17
 pycountry
 humanize
+pybars3

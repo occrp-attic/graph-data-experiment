@@ -1,3 +1,4 @@
+from memorious.mapper.types import resolve_type
 from memorious.mapper.util import dict_list
 
 
@@ -7,9 +8,8 @@ class SchemaProperty(object):
         self.schema = schema
         self.name = name
         self.data = data
-        self.is_label = data.get('label', False)
-        self.is_fingerprint = data.get('fingerprint', False)
-        self.is_fingerprint = self.is_label or self.is_fingerprint
+        self.is_label = name == 'name'
+        self.type_cls = resolve_type(data.get('type', 'string'))
 
     def __repr__(self):
         return '<SchemaProperty(%r, %r)>' % (self.schema, self.name)

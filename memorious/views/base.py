@@ -18,14 +18,15 @@ def index():
 def search():
     query = Query(request.args, path=request.path)
     query.add_facet('schemata', 'Types', entity_schema_label)
+    query.add_facet('countries', 'Countries', dataset_label)
     query.add_facet('dataset', 'Dataset', dataset_label)
-    results = search_entities(query)
+    results = search_entities(query, request.auth)
     return render_template("search.html", query=query, results=results)
 
 
 @blueprint.route('/entities/<entity_id>')
 def entity(entity_id):
-    entity = load_entity(entity_id)
+    entity = load_entity(entity_id, request.auth)
     if entity is None:
         raise NotFound()
     return render_template("entity.html", entity=entity)

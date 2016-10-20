@@ -1,5 +1,6 @@
 from memorious.mapper.schema import Schema
 from memorious.mapper.dataset import Dataset
+from memorious.mapper.auth import Group
 
 
 class Model(object):
@@ -15,6 +16,10 @@ class Model(object):
         self.datasets = []
         for name, dconfig in data.get('datasets', {}).items():
             self.datasets.append(Dataset(self, name, dconfig))
+
+        self.groups = []
+        for name, members in data.get('groups', {}).items():
+            self.groups.append(Group(name, members))
 
     def get_schema(self, section, name):
         for schema in self.schemata:

@@ -8,7 +8,7 @@ FACET_SIZE = 500
 FILTERS = ['schemata', 'dataset', 'countries']
 
 
-def search_entities(query):
+def search_entities(query, auth):
     if query.has_text:
         q = {
             'query_string': {
@@ -21,7 +21,7 @@ def search_entities(query):
     else:
         q = {'match_all': {}}
 
-    must_filters = []
+    must_filters = [{'terms': {'groups': auth.groups}}]
     for field_filter in FILTERS:
         values = query.getlist(field_filter)
         if values:
@@ -56,11 +56,16 @@ def search_entities(query):
     return ResultSet(query, result)
 
 
-def load_entity(entity_id):
+def load_entity(entity_id, auth):
     # TODO: where to put in authz?
     q = {
         'query': {
-            'term': {'_id': entity_id}
+            'bool': {
+                'must': [
+                    {'term': {'_id': entity_id}},
+                    {'terms': {'groups': auth.groups}}
+                ]
+            }
         }
     }
     result = es.search(index=es_index, doc_type=Schema.ENTITY, body=q)

@@ -21,23 +21,25 @@
 {% endmacro %}
 
 {% macro facet(query, facet) %}
-  <table class="table table-condensed table-facets">
-    <tr>
-      <th colspan="2">
-        {{facet.label}}
-      </th>
-    </tr>
-    {% for bucket in facet.buckets %}
-      <tr class="{% if query.has_param(facet.field, bucket.key) %}active{% endif %}">
-        <td>
-          <a href="{{ query.toggle_param(facet.field, bucket.key) }}">
-            {{bucket.label}}
-          </a>
-        </td>
-        <td class="numeric">
-          {{bucket.count | intcomma}}
-        </td>
+  {% if facet.buckets %}
+    <table class="table table-condensed table-facets">
+      <tr>
+        <th colspan="2">
+          {{facet.label}}
+        </th>
       </tr>
-    {% endfor %}
-  </table>
+      {% for bucket in facet.buckets %}
+        <tr class="{% if query.has_param(facet.field, bucket.key) %}active{% endif %}">
+          <td>
+            <a href="{{ query.toggle_param(facet.field, bucket.key) }}">
+              {{bucket.label}}
+            </a>
+          </td>
+          <td class="numeric">
+            {{bucket.count | intcomma}}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
 {% endmacro %}

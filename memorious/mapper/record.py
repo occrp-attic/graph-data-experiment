@@ -14,11 +14,6 @@ class Record(dict):
             if isinstance(text, six.string_types) and len(text.strip()):
                 self.text.append(text)
 
-    def get_ref(self, ref):
-        if ref not in self:
-            raise ValueError("Invalid column reference: %s" % ref)
-        return self.get(ref)
-
     def iterindex(self, record):
         entities = {}
         for entity in self.dataset.entities:

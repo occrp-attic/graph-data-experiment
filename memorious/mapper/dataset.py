@@ -5,6 +5,7 @@ from sqlalchemy.schema import Table
 
 from memorious.core import meta, engine
 from memorious.util import DATA_PAGE
+from memorious.mapper.util import dict_list
 from memorious.mapper.mapper import EntityMapper, LinkMapper
 from memorious.mapper.record import Record
 
@@ -63,6 +64,7 @@ class Dataset(object):
         self.data = data
         self.meta = data.get('meta', {})
         self.label = self.meta.get('label', name)
+        self.groups = dict_list(data, 'groups', 'group')
 
         tables = data.get('tables', [data.get('table')])
         self.tables = [DatasetTable(self, f) for f in tables]

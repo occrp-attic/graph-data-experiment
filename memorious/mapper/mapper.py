@@ -2,9 +2,9 @@ import re
 import six
 from hashlib import sha1
 from pybars import Compiler
-import fingerprints
 
 from memorious.mapper.schema import Schema
+from memorious.mapper.types import NameProperty, CountryProperty
 from memorious.mapper.util import dict_list
 
 
@@ -17,7 +17,7 @@ class MapperProperty(object):
         self.name = name
         self.data = data
         self.schema = schema
-        self.type_name = data.get('type')
+        self.type = schema.type_cls(self)
         self.refs = dict_list(data, 'column', 'columns')
         self.literal = data.get('literal')
 
@@ -26,6 +26,7 @@ class MapperProperty(object):
         if self.format is not None:
             for ref in self.FORMAT_PATTERN.findall(self.format):
                 self.refs.append(ref)
+            # compile the format string into a handlebars template
             self.template = self.compiler.compile(six.text_type(self.format))
 
     def get_values(self, record):
@@ -36,16 +37,10 @@ class MapperProperty(object):
         return [record.get(r) for r in self.refs]
 
     def get_value(self, record):
-        # collate value by default
+        # select the first non-null value by default
         for value in self.get_values(record):
             if value is not None:
                 return value
-
-    def get_fingerprints(self, record):
-        for value in self.get_values(record):
-            fp = fingerprints.generate(value)
-            if fp is not None:
-                yield fp
 
 
 class Mapper(object):
@@ -97,10 +92,13 @@ class Mapper(object):
             'schema': self.schema.name,
             'schemata': list(self.schema.schemata),
             'dataset': self.dataset.name,
+            'groups': self.dataset.groups,
             'properties': self.compute_properties(record),
             'fingerprints': [],
-            'text': record.text,
-            # 'record': dict(record)
+            'countries': [],
+            'phones': [],
+            'addresses': [],
+            'text': record.text
         }
 
 
@@ -120,13 +118,24 @@ class EntityMapper(Mapper):
         data['id'] = self.compute_key(record)
 
         for prop in self.properties:
+            value = values.get(prop.name)
+
             # Find an set the name property
             if prop.schema.is_label:
-                data['name'] = values.get(prop.name)
+                data['name'] = value
 
             # Add fingerprinted properties.
-            if prop.schema.is_fingerprint:
-                data['fingerprints'].extend(prop.get_fingerprints(record))
+            if isinstance(prop.type, NameProperty):
+                fps = prop.type.normalize(value, record)
+                data['fingerprints'].extend(fps)
+
+            # Country codes index.
+            if isinstance(prop.type, CountryProperty):
+                ccs = prop.type.normalize(value, record)
+                data['countries'].extend(ccs)
+
+        # from pprint import pprint
+        # pprint(data)
         return data
 
 

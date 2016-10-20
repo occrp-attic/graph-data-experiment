@@ -34,4 +34,10 @@ def _dataset_iter(dataset):
 
 def index_dataset(dataset):
     bulk(es, _dataset_iter(dataset), stats_only=True,
-         chunk_size=DATA_PAGE, request_timeout=200.0)
+         chunk_size=DATA_PAGE / 10.0, request_timeout=200.0)
+    optimize_search()
+
+
+def optimize_search():
+    """Run a full index restructure. May take a while."""
+    es.indices.optimize(index=es_index)

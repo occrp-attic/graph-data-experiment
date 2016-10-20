@@ -24,8 +24,8 @@ emporium - table metadata layer
 * Entity profile page
 * Entity links
 * [done] OAuth login
-* Type parser framework
-* Country fields
-* Address fields
-* Telephone fields
-* EMail fields
+* [done] Type parser framework
+* [done] Country fields
+* [done] Address fields
+* [done] Telephone fields
+* [done] EMail fields
