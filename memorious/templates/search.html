@@ -24,6 +24,11 @@
                   {{result.properties.name}}
                 </a>
               </td>
+              <td>
+                {% for country in result.data.countries %}
+                  {{ country }} {% if not loop.last %}&middot;{% endif %}
+                {% endfor %}
+              </td>
             </tr>
           {% endfor %}
         </table>

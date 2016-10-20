@@ -1,8 +1,18 @@
 from flask import request
 from urlparse import urlparse, urljoin
+from pycountry import countries
 
 from memorious.core import model
 from memorious.mapper.schema import Schema
+
+COUNTRY_NAMES = {
+    'ZZ': 'Global',
+    'EU': 'European Union',
+    'XK': 'Kosovo'
+}
+
+for country in countries:
+    COUNTRY_NAMES[country.alpha2] = country.name
 
 
 def dataset_label(key):
@@ -18,6 +28,10 @@ def entity_schema_label(key):
         return schema.label
     except Exception:
         return key
+
+
+def country_label(key):
+    return COUNTRY_NAMES.get(key, key)
 
 
 def is_safe_url(target):

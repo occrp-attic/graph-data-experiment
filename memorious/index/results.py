@@ -74,7 +74,7 @@ class ResultSet(object):
             return ''
         return self.query.make_page_url(self.query.page - 1)
 
-    def pager(self, pager_range=8):
+    def pager(self, pager_range=4):
         low = self.query.page - pager_range
         high = self.query.page + pager_range
 
