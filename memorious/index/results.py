@@ -6,10 +6,11 @@ from memorious.mapper.schema import Schema
 
 class ResultDocument(object):
 
-    def __init__(self, document):
+    def __init__(self, document, parent=None):
         self.document = document
         self.data = document.get('_source')
         self.id = document.get('_id')
+        self.parent = parent
         self.properties = self.data.get('properties')
         self.schema = model.get_schema(document.get('_type'),
                                        self.data.get('schema'))
@@ -17,9 +18,23 @@ class ResultDocument(object):
 
 class EntityResult(ResultDocument):
 
-    def __init__(self, document):
-        super(EntityResult, self).__init__(document)
+    def __init__(self, document, parent=None):
+        super(EntityResult, self).__init__(document, parent=parent)
         self.name = self.data.get('name')
+
+
+class LinkResult(ResultDocument):
+
+    def __init__(self, document, parent=None):
+        super(LinkResult, self).__init__(document, parent=parent)
+        self.source = self.data.get('source')
+        self.target = self.data.get('target')
+        if parent and self.source.get('id') == parent.id:
+            self.other = self.target
+            self.reversed = False
+        if parent and self.target.get('id') == parent.id:
+            self.other = self.source
+            self.reversed = True
 
 
 class FacetBucket(object):
@@ -41,9 +56,10 @@ class FacetBucket(object):
 
 class ResultSet(object):
 
-    def __init__(self, query, results):
+    def __init__(self, query, results, parent=None):
         self.query = query
         self.results = results
+        self.parent = parent
         self.hits = results.get('hits', {})
         self.aggregations = results.get('aggregations', {})
         self.total = self.hits.get('total', 0)
@@ -102,9 +118,9 @@ class ResultSet(object):
     def __iter__(self):
         for document in self.hits.get('hits', []):
             if document.get('_type') == Schema.ENTITY:
-                yield EntityResult(document)
-            else:
-                yield document
+                yield EntityResult(document, parent=self.parent)
+            elif document.get('_type') == Schema.LINK:
+                yield LinkResult(document, parent=self.parent)
 
     def __len__(self):
         return self.total

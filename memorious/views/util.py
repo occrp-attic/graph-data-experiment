@@ -30,6 +30,14 @@ def entity_schema_label(key):
         return key
 
 
+def link_schema_label(key):
+    try:
+        schema = model.get_schema(Schema.LINK, key)
+        return schema.label
+    except Exception:
+        return key
+
+
 def country_label(key):
     return COUNTRY_NAMES.get(key, key)
 

@@ -14,13 +14,17 @@ class Facet(object):
 class Query(object):
     """Hold state for common query parameters."""
 
-    def __init__(self, args, path=None, limit=None):
+    def __init__(self, args, prefix='', path=None, limit=None):
         if not isinstance(args, MultiDict):
             args = MultiDict(args)
         self.args = args
+        self.prefix = prefix
         self.path = path or ''
         self._limit = limit
         self.facets = []
+
+    def alias(self, arg):
+        return self.prefix + arg
 
     @property
     def limit(self):
@@ -74,26 +78,28 @@ class Query(object):
     def make_url(self, params):
         if not len(params):
             return self.path
-        params = [(k, unicode(v).encode('utf-8')) for (k, v) in params]
+        params = [(self.alias(k), unicode(v).encode('utf-8'))
+                  for (k, v) in params]
         return self.path + '?' + urlencode(params)
 
     def make_page_url(self, page):
-        # TODO: add prefix support
         return self.add_param('offset', (page - 1) * self.limit)
 
     @property
     def items(self):
         for (k, v) in self.args.iteritems(multi=True):
-            # TODO: add prefix support
+            if not k.startswith(self.prefix):
+                continue
+            k = k[len(self.prefix):]
             if k == 'offset':
                 continue
             yield k, v
 
     def getlist(self, name, default=None):
-        if name not in self.args:
+        if self.alias(name) not in self.args:
             return default or []
         # TODO: add prefix support
-        values = self.args.getlist(name)
+        values = self.args.getlist(self.alias(name))
         if not len(values):
             return default or []
         return values

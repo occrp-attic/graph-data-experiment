@@ -8,7 +8,37 @@
     <div class="col-md-9">   
       {{entity.name}}
 
-      <pre>{{entity.data | tojson(indent=2)}}</pre>
+      <!-- pre>{{entity.data | tojson(indent=2)}}</pre -->
     </div>
   </div>
+  {% if links.total %}
+    <div class="row">
+      <div class="col-md-3">
+        {% for facet in links.facets %}
+          {{ macros.facet(links.query, facet) }}
+        {% endfor %}
+      </div>
+      <div class="col-md-9">   
+        <table class="table table-condensed">
+          <tr>
+            <th>Type</th>
+            <th>Entity</th>
+          </tr>
+          {% for link in links %}
+            <tr>
+              <td width="15%">
+                {{link.schema.label}}
+              </td>
+              <td>
+                <a href="{{url_for('base.entity', entity_id=link.other.id)}}">
+                  {{link.other.name}}
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        {{ macros.pager(links) }}
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

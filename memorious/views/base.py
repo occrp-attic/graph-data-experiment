@@ -2,9 +2,10 @@ import logging
 from werkzeug.exceptions import NotFound
 from flask import render_template, Blueprint, request
 
-from memorious.index import search_entities, load_entity, Query
+from memorious.index import search_entities, search_links
+from memorious.index import load_entity, Query
 from memorious.views.util import dataset_label, entity_schema_label
-from memorious.views.util import country_label
+from memorious.views.util import country_label, link_schema_label
 
 blueprint = Blueprint('base', __name__)
 log = logging.getLogger(__name__)
@@ -30,4 +31,10 @@ def entity(entity_id):
     entity = load_entity(entity_id, request.auth)
     if entity is None:
         raise NotFound()
-    return render_template("entity.html", entity=entity)
+
+    # load links
+    query = Query(request.args, prefix='links_', path=request.path)
+    query.add_facet('schemata', 'Types', link_schema_label)
+    links = search_links(entity, query, request.auth)
+
+    return render_template("entity.html", entity=entity, links=links)

@@ -35,7 +35,6 @@ ENTITY_MAPPING = {
         "countries": {"type": "string", "index": "not_analyzed"},
         "phones": {"type": "string", "index": "not_analyzed"},
         "addresses": {"type": "string", "index": "not_analyzed"},
-        "record": {"type": "nested"},
         "properties": {"type": "nested"},
     }
 }
@@ -73,7 +72,6 @@ LINK_MAPPING = {
         "text": {"type": "string", "index": "analyzed"},
         "fingerprints": {"type": "string", "index": "not_analyzed"},
         "entities": {"type": "string", "index": "not_analyzed"},
-        "record": {"type": "nested"},
         "properties": {"type": "nested"},
         "source": {
             "type": "object",
