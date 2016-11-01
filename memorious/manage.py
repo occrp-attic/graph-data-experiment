@@ -13,7 +13,6 @@ manager = Manager(app)
 
 
 def sub_opts(app, **kwargs):
-    print app, kwargs
     pass
 
 dataset_manager = Manager(sub_opts, help="Dataset-related operations",
