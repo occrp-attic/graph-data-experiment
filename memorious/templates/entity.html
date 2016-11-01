@@ -2,16 +2,28 @@
 
 {% block title %}{{ entity.name }}{% endblock %}
 
-{% block content %}
-  <div class="row">
-    <div class="col-md-3"></div>
-    <div class="col-md-9">   
-      {{entity.name}}
+{% block content %} 
+  {{ macros.header(entity.name) }}
 
-      <!-- pre>{{entity.data | tojson(indent=2)}}</pre -->
+  {% if entity.has_properties() %}
+    {{ macros.subheader("Properties") }}    
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-9">
+        <table class="table table-condensed">
+          {% for prop, value in entity.list_properties() %}
+            <tr>
+              <th width="30%">{{prop.label}}</th>
+              <td>{{value}}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
     </div>
-  </div>
+  {% endif %}
+
   {% if links.total %}
+    {{ macros.subheader("Relationships") }}
     <div class="row">
       <div class="col-md-3">
         {% for facet in links.facets %}
@@ -27,7 +39,7 @@
           {% for link in links %}
             <tr>
               <td width="15%">
-                {{link.schema.label}}
+                {{link.label}}
               </td>
               <td>
                 <a href="{{url_for('base.entity', entity_id=link.other.id)}}">

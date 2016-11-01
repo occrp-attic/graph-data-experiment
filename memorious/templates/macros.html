@@ -1,3 +1,21 @@
+{% macro header(title) %}
+  <div class="row header">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <h2>{{title}}</h2>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro subheader(title) %}
+  <div class="row subheader">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <h3>{{title}}</h3>
+    </div>
+  </div>
+{% endmacro %}
+
 {% macro pager(results) %}
   {% if results.pages > 1 %}
     <ul class="pagination">

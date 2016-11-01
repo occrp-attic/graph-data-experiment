@@ -20,9 +20,11 @@ emporium - table metadata layer
 
 ### TODO
 
+* Script command
+* Figure out multi-view code
 * Entity overlap collector
-* Entity profile page
-* Entity links
+* [done] Entity profile page
+* [done] Entity links
 * [done] OAuth login
 * [done] Type parser framework
 * [done] Country fields

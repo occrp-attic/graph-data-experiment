@@ -15,6 +15,17 @@ class ResultDocument(object):
         self.schema = model.get_schema(document.get('_type'),
                                        self.data.get('schema'))
 
+    def list_properties(self):
+        listed = []
+        for name, value in self.properties.items():
+            prop = self.schema.get(name)
+            if not prop.is_hidden:
+                listed.append((prop, value))
+        return sorted(listed, key=lambda (p, v): p.label)
+
+    def has_properties(self):
+        return len(list(self.list_properties())) > 0
+
 
 class EntityResult(ResultDocument):
 
@@ -32,9 +43,11 @@ class LinkResult(ResultDocument):
         if parent and self.source.get('id') == parent.id:
             self.other = self.target
             self.reversed = False
+            self.label = self.schema.forward
         if parent and self.target.get('id') == parent.id:
             self.other = self.source
             self.reversed = True
+            self.label = self.schema.reverse
 
 
 class FacetBucket(object):

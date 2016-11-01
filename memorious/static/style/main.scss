@@ -40,9 +40,9 @@ footer {
     margin-bottom: 1em;
 
     h1 {
-        font-size: 1.2em;
+        font-size: 1.8em;
         font-weight: 900;
-        margin-top: 0.6em;
+        margin-top: 0em;
     }
 }
 
@@ -52,3 +52,29 @@ footer {
         font-weight: bold;
     }
 }
+
+/* Page layout re-usable bits. */
+.subheader, .header {
+    h2 {
+        // border-bottom: 1px solid #333;
+        padding-bottom: 0.5em;
+        margin-bottom: 0.5em;
+        font-size: 1.4em;
+        font-weight: 900;
+    }
+
+    h3 {
+        // border-bottom: 1px solid #333;
+        padding-bottom: 0.5em;
+        margin-bottom: 0.5em;
+        font-size: 1.2em;
+        font-weight: 900;
+    }
+}
+
+.header {
+    background-color: $grey-dark;
+    color: white;
+    margin-bottom: 1em;
+}
+

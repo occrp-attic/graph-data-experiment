@@ -8,6 +8,8 @@ class SchemaProperty(object):
         self.schema = schema
         self.name = name
         self.data = data
+        self.label = data.get('label', name)
+        self.is_hidden = data.get('hidden', False)
         self.is_label = name == 'name'
         self.type_cls = resolve_type(data.get('type', 'string'))
 
@@ -37,6 +39,11 @@ class Schema(object):
         self._own_properties = []
         for name, prop in data.get('properties', {}).items():
             self._own_properties.append(SchemaProperty(self, name, prop))
+
+        if section == self.LINK:
+            # links only:
+            self.forward = data.get('forward', self.label)
+            self.reverse = data.get('reverse', self.label)
 
     @property
     def extends(self):

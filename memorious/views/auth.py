@@ -22,7 +22,6 @@ def get_oauth_token():
 @blueprint.before_app_request
 def prepare_auth():
     request.auth = Auth(session.get('user'), model)
-    print request.auth
 
 
 @blueprint.route('/login')
