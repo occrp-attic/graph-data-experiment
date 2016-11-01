@@ -1,5 +1,5 @@
 import logging
-from elasticsearch.helpers import bulk
+from elasticsearch.helpers import bulk, scan
 
 from memorious.core import es, es_index
 from memorious.util import DATA_PAGE
@@ -35,6 +35,25 @@ def _dataset_iter(dataset):
 def index_dataset(dataset):
     bulk(es, _dataset_iter(dataset), stats_only=True,
          chunk_size=DATA_PAGE / 10.0, request_timeout=200.0)
+    optimize_search()
+
+
+def delete_dataset(dataset):
+    """Delete all entries from a particular dataset."""
+    q = {'query': {'term': {'dataset': dataset.name}}, '_source': False}
+
+    def deletes():
+        for i, res in enumerate(scan(es, query=q, index=es_index)):
+            yield {
+                '_op_type': 'delete',
+                '_index': str(es_index),
+                '_type': res.get('_type'),
+                '_id': res.get('_id')
+            }
+            if i > 0 and i % 10000 == 0:
+                log.info("Delete %s: %s", dataset, i)
+    es.indices.refresh(index=es_index)
+    bulk(es, deletes(), stats_only=True, chunk_size=DATA_PAGE)
     optimize_search()
 
 

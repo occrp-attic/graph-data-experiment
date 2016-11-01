@@ -27,5 +27,11 @@ class Model(object):
                 return schema
         raise TypeError("No such schema for %s: %s" % (section, name))
 
+    def get_dataset(self, name):
+        for dataset in self.datasets:
+            if dataset.name == name:
+                return dataset
+        raise NameError("No such dataset: %s" % name)
+
     def __repr__(self):
         return '<Model(%r, %r)>' % (self.schemata, self.datasets)
