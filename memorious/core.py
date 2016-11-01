@@ -81,7 +81,7 @@ def get_es():
     app = current_app._get_current_object()
     if not hasattr(app, '_es_instance'):
         app._es_instance = Elasticsearch(get_config('ELASTICSEARCH_URL'),
-                                         timeout=240)
+                                         timeout=240, sniff_on_start=True)
     return app._es_instance
 
 
