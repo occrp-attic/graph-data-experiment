@@ -1,7 +1,7 @@
 import math
 
 from memorious.core import model
-from memorious.mapper.schema import Schema
+from memorious.schema import Schema
 
 
 class ResultDocument(object):

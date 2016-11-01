@@ -3,7 +3,7 @@ from urlparse import urlparse, urljoin
 from pycountry import countries
 
 from memorious.core import model
-from memorious.mapper.schema import Schema
+from memorious.schema import Schema
 
 COUNTRY_NAMES = {
     'ZZ': 'Global',

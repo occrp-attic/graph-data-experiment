@@ -3,9 +3,9 @@ import six
 from hashlib import sha1
 from pybars import Compiler
 
-from memorious.mapper.schema import Schema
-from memorious.mapper.types import NameProperty, CountryProperty
-from memorious.mapper.util import dict_list
+from memorious.schema import Schema
+from memorious.schema.types import NameProperty, CountryProperty
+from memorious.util import dict_list
 
 
 class MapperProperty(object):

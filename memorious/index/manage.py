@@ -1,7 +1,7 @@
 import logging
 
 from memorious.core import es, es_index
-from memorious.mapper.schema import Schema
+from memorious.schema import Schema
 from memorious.index.mapping import LINK_MAPPING, ENTITY_MAPPING
 
 log = logging.getLogger(__name__)

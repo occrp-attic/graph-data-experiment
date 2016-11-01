@@ -1,4 +1,4 @@
-from memorious.mapper.schema import Schema
+from memorious.schema import Schema
 from memorious.mapper.dataset import Dataset
 from memorious.mapper.auth import Group
 

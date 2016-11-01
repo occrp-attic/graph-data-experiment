@@ -1,7 +1,7 @@
 from pprint import pprint  # noqa
 
 from memorious.core import es, es_index
-from memorious.mapper.schema import Schema
+from memorious.schema import Schema
 from memorious.index.results import ResultSet, EntityResult
 
 FACET_SIZE = 500

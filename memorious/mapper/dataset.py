@@ -4,8 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.schema import Table
 
 from memorious.core import meta, engine
-from memorious.util import DATA_PAGE
-from memorious.mapper.util import dict_list
+from memorious.util import dict_list, DATA_PAGE
 from memorious.mapper.mapper import EntityMapper, LinkMapper
 from memorious.mapper.record import Record
 
@@ -62,8 +61,8 @@ class Dataset(object):
         self.model = model
         self.name = six.text_type(name)
         self.data = data
-        self.meta = data.get('meta', {})
-        self.label = self.meta.get('label', name)
+        self.label = data.get('label', name)
+        self.info_url = data.get('info_url')
         self.groups = dict_list(data, 'groups', 'group')
 
         tables = data.get('tables', [data.get('table')])
@@ -96,6 +95,11 @@ class Dataset(object):
 
     @property
     def mapped_columns(self):
+        """Determine which columns must be selected.
+
+        This will check entity and link mappings for the set of columns
+        actually used in order to avoid loading superfluous data.
+        """
         refs = set()
         for item in self.entities + self.links:
             for ref in item.refs:
@@ -112,6 +116,7 @@ class Dataset(object):
         return q
 
     def iterrecords(self):
+        """Compose the actual query and return an iterator of ``Record``."""
         q = select(columns=self.mapped_columns, from_obj=self.from_clause)
         q = self.apply_filters(q)
         log.info("Query [%s]: %s", self.name, q)

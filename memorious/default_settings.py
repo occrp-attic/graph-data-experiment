@@ -3,7 +3,7 @@ import os
 DEBUG = True
 
 APP_NAME = 'memorious'
-APP_TITLE = 'memorious'
+APP_TITLE = 'PEPsickle'
 
 DATABASE_URL = os.environ.get('DATABASE_URI')
 ELASTICSEARCH_URL = 'http://localhost:9200/'

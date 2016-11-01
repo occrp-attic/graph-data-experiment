@@ -1,6 +1,6 @@
 import six
 
-from memorious.mapper.schema import Schema
+from memorious.schema import Schema
 
 
 class Record(dict):

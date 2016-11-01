@@ -1,3 +1,13 @@
+"""Authorization system.
+
+The authorization system is as simple as possible. It is specified as part of
+a YAML model and based around the email address retrieved as part of the
+OAuth authentication process. Email addresses are then assigned to groups,
+and each dataset specifies the groups which shall have read access to it.
+
+Additionally, two pseudo-group exists: "Anybody" for all site visitors, and
+"Users" for those who have signed into the site.
+"""
 
 
 class Group(object):
@@ -8,19 +18,21 @@ class Group(object):
         self.members = [self.normalise_user(u) for u in members]
 
     def normalise_user(self, user):
+        if user is None:
+            return
         return user.lower().strip()
 
     def is_member(self, user):
         return self.normalise_user(user) in self.members
 
 
-class VisitorsGroup(Group):
+class AnybodyGroup(Group):
     """Anyone."""
 
-    NAME = 'visitors'
+    NAME = 'anybody'
 
     def __init__(self):
-        super(VisitorsGroup, self).__init__(self.NAME, [])
+        super(AnybodyGroup, self).__init__(self.NAME, [])
 
     def is_member(self, user):
         return True
@@ -51,7 +63,7 @@ class Auth(object):
         self.model = model
         self.groups = []
 
-        for group in model.groups + [UsersGroup(), VisitorsGroup()]:
+        for group in model.groups + [UsersGroup(), AnybodyGroup()]:
             if group.is_member(user):
                 self.groups.append(group.name)
 
