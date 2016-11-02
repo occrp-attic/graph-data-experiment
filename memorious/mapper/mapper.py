@@ -5,7 +5,6 @@ from pybars import Compiler
 from pprint import pprint  # noqa
 
 from memorious.schema import Schema
-from memorious.schema.types import NameProperty, CountryProperty
 from memorious.util import dict_list
 
 
@@ -49,12 +48,12 @@ class MapperProperty(object):
 
 class Mapper(object):
 
-    def __init__(self, dataset, data):
-        self.dataset = dataset
+    def __init__(self, query, data):
+        self.query = query
         self.data = data
         self.keys = dict_list(data, 'keys', 'key')
 
-        model = dataset.model
+        model = query.dataset.model
         self.schema = model.get_schema(self.section, data.get('schema'))
         if self.schema is None:
             raise TypeError("Invalid schema: %r" % data.get('schema'))

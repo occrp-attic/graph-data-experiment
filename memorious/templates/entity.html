@@ -36,29 +36,33 @@
     </div>
   </div>
 
-  {% if links.total %}
+  {% if links.visible %}
     {{ macros.subheader("Relationships") }}
     <div class="row">
       <div class="col-md-3">
-        {% for facet in links.facets %}
-          {{ macros.facet(links.query, facet) }}
-        {% endfor %}
+        {% if links.show_filters %}
+          {% for facet in links.facets %}
+            {{ macros.facet(links.query, facet) }}
+          {% endfor %}
+        {% endif %}
       </div>
       <div class="col-md-9">
-        <form>
-          <div class="form-group">
-            <input class="form-control" name="{{ links.query.alias('q') }}"
-                   value="{{ links.query.text }}"
-                   placeholder="Search relationships">
-            {% if links.query is defined %}
-              {% for arg, value in links.query.items %}
-                {% if arg != links.query.alias('q') %}
-                  <input type="hidden" name="{{arg}}" value="{{value}}">
-                {% endif %}
-              {% endfor %}
-            {% endif %}
-          </div>
-        </form>
+        {% if links.show_filters %}
+          <form>
+            <div class="form-group">
+              <input class="form-control" name="{{ links.query.alias('q') }}"
+                     value="{{ links.query.text }}"
+                     placeholder="Search relationships">
+              {% if links.query is defined %}
+                {% for arg, value in links.query.items %}
+                  {% if arg != links.query.alias('q') %}
+                    <input type="hidden" name="{{arg}}" value="{{value}}">
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
+          </form>
+        {% endif %}
 
         <table class="table table-condensed">
           <tr>

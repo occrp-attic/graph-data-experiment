@@ -52,6 +52,15 @@ class Query(object):
             return False
         return len(self.text.strip()) > 0
 
+    @property
+    def has_query(self):
+        if self.has_text:
+            return True
+        # TODO: make this know the actual available filters.
+        for item in self.items:
+            return True
+        return False
+
     def add_facet(self, field, label, label_func=None):
         self.facets.append(Facet(field, label, label_func=label_func))
 
