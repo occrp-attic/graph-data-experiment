@@ -7,20 +7,20 @@ from memorious.schema import Schema
 class ResultDocument(object):
 
     def __init__(self, document, parent=None):
+        self.parent = parent
         self.document = document
         self.data = document.get('_source')
         self.id = document.get('_id')
-        self.parent = parent
         self.properties = self.data.get('properties')
         self.schema = model.get_schema(document.get('_type'),
                                        self.data.get('schema'))
 
     def list_properties(self):
         listed = []
-        for name, value in self.properties.items():
+        for name, values in self.properties.items():
             prop = self.schema.get(name)
-            if not prop.is_hidden:
-                listed.append((prop, value))
+            if not prop.is_hidden and len(values):
+                listed.append((prop, values))
         return sorted(listed, key=lambda (p, v): p.label)
 
     def has_properties(self):

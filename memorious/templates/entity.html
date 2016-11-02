@@ -11,10 +11,14 @@
       <div class="col-md-3"></div>
       <div class="col-md-9">
         <table class="table table-condensed">
-          {% for prop, value in entity.list_properties() %}
+          {% for prop, values in entity.list_properties() %}
             <tr>
               <th width="30%">{{prop.label}}</th>
-              <td>{{value}}</td>
+              <td>
+                {% for value in values %}
+                  {{value}}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+              </td>
             </tr>
           {% endfor %}
         </table>

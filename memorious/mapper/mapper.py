@@ -2,6 +2,7 @@ import re
 import six
 from hashlib import sha1
 from pybars import Compiler
+from pprint import pprint  # noqa
 
 from memorious.schema import Schema
 from memorious.schema.types import NameProperty, CountryProperty
@@ -69,7 +70,7 @@ class Mapper(object):
                 yield ref
 
     def compute_properties(self, record):
-        return {p.name: p.get_value(record) for p in self.properties}
+        return {p.name: p.get_values(record) for p in self.properties}
 
     def compute_key(self, record):
         if not len(self.keys):
@@ -114,27 +115,26 @@ class EntityMapper(Mapper):
 
     def to_index(self, record):
         data = super(EntityMapper, self).to_index(record)
-        values = data['properties']
+        properties = data['properties']
         data['id'] = self.compute_key(record)
 
         for prop in self.properties:
-            value = values.get(prop.name)
+            values = properties.get(prop.name)
 
             # Find an set the name property
-            if prop.schema.is_label:
-                data['name'] = value
+            if prop.schema.is_label and len(values):
+                data['name'] = values[0]
 
             # Add fingerprinted properties.
             if isinstance(prop.type, NameProperty):
-                fps = prop.type.normalize(value, record)
+                fps = prop.type.normalize(values, record)
                 data['fingerprints'].extend(fps)
 
             # Country codes index.
             if isinstance(prop.type, CountryProperty):
-                ccs = prop.type.normalize(value, record)
+                ccs = prop.type.normalize(values, record)
                 data['countries'].extend(ccs)
 
-        # from pprint import pprint
         # pprint(data)
         return data
 
