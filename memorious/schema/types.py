@@ -7,6 +7,7 @@ from phonenumbers.phonenumberutil import NumberParseException
 
 
 class StringProperty(object):
+    index_invert = None
 
     def __init__(self, prop):
         self.prop = prop
@@ -32,30 +33,35 @@ class StringProperty(object):
 
 
 class NameProperty(StringProperty):
+    index_invert = 'fingerprints'
 
     def normalize_value(self, value, record):
         return fingerprints.generate(value)
 
 
 class DateProperty(StringProperty):
+    index_invert = 'dates'
 
     def normalize_value(self, value, record):
         return value
 
 
 class CountryProperty(StringProperty):
+    index_invert = 'countries'
 
     def normalize_value(self, value, record):
         return countrynames.to_code(value)
 
 
 class AddressProperty(StringProperty):
+    index_invert = 'addresses'
 
     def normalize_value(self, value, record):
         return value
 
 
 class PhoneProperty(StringProperty):
+    index_invert = 'phones'
     FORMAT = phonenumbers.PhoneNumberFormat.INTERNATIONAL
 
     def get_countries(self, record):
@@ -80,6 +86,7 @@ class PhoneProperty(StringProperty):
 
 
 class EmailProperty(StringProperty):
+    index_invert = 'emails'
 
     def normalize(self, value, record):
         for value in self.prop.get_values(record):

@@ -6,15 +6,6 @@ ENTITY_MAPPING = {
     "dynamic_templates": [
         {
             "fields": {
-                "match": "record.*",
-                "mapping": {
-                    "type": "string",
-                    "index": "analyzed"
-                }
-            }
-        },
-        {
-            "fields": {
                 "match": "properties.*",
                 "mapping": {
                     "type": "string",
@@ -33,6 +24,8 @@ ENTITY_MAPPING = {
         "text": {"type": "string", "index": "analyzed"},
         "fingerprints": {"type": "string", "index": "not_analyzed"},
         "countries": {"type": "string", "index": "not_analyzed"},
+        "dates": {"type": "string", "index": "not_analyzed"},
+        "emails": {"type": "string", "index": "not_analyzed"},
         "phones": {"type": "string", "index": "not_analyzed"},
         "addresses": {"type": "string", "index": "not_analyzed"},
         "properties": {"type": "nested"},
@@ -46,7 +39,7 @@ LINK_MAPPING = {
     "dynamic_templates": [
         {
             "fields": {
-                "match": "record.*",
+                "match": "properties.*",
                 "mapping": {
                     "type": "string",
                     "index": "not_analyzed"
@@ -55,7 +48,7 @@ LINK_MAPPING = {
         },
         {
             "fields": {
-                "match": "properties.*",
+                "match": "remote.properties.*",
                 "mapping": {
                     "type": "string",
                     "index": "not_analyzed"
@@ -70,24 +63,18 @@ LINK_MAPPING = {
         "dataset": {"type": "string", "index": "not_analyzed"},
         "groups": {"type": "string", "index": "not_analyzed"},
         "text": {"type": "string", "index": "analyzed"},
-        "fingerprints": {"type": "string", "index": "not_analyzed"},
-        "entities": {"type": "string", "index": "not_analyzed"},
         "properties": {"type": "nested"},
-        "source": {
+        "origin": {
             "type": "object",
             "properties": {
                 "id": {"type": "string", "index": "not_analyzed"},
-                "fingerprints": {"type": "string", "index": "not_analyzed"},
-                "name": {"type": "string", "index": "not_analyzed"}
+                "fingerprints": {"type": "string", "index": "not_analyzed"}
             }
         },
-        "target": {
+        "remote": {
             "type": "object",
-            "properties": {
-                "id": {"type": "string", "index": "not_analyzed"},
-                "fingerprints": {"type": "string", "index": "not_analyzed"},
-                "name": {"type": "string", "index": "not_analyzed"}
-            }
+            "include_in_all": True,
+            "properties": ENTITY_MAPPING.get('properties')
         }
     }
 }

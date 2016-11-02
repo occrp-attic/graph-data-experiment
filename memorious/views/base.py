@@ -35,5 +35,6 @@ def entity(entity_id):
     # load links
     query = Query(request.args, prefix='links_', path=request.path)
     query.add_facet('schemata', 'Types', link_schema_label)
+    query.add_facet('remote.countries', 'Countries', country_label)
     links = search_links(entity, query, request.auth)
     return render_template("entity.html", entity=entity, links=links)

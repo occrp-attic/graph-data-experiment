@@ -42,7 +42,7 @@ class MapperProperty(object):
         return list(set([v for v in values if v is not None]))
 
     def get_value(self, record):
-        # select the first non-null value by default
+        # Select the first non-null value by default (like SQL COALESCE())
         for value in self.get_values(record):
             return value
 
@@ -98,10 +98,6 @@ class Mapper(object):
             'dataset': self.dataset.name,
             'groups': self.dataset.groups,
             'properties': self.compute_properties(record),
-            'fingerprints': [],
-            'countries': [],
-            'phones': [],
-            'addresses': [],
             'text': record.text
         }
 
@@ -128,15 +124,13 @@ class EntityMapper(Mapper):
             if prop.schema.is_label and len(values):
                 data['name'] = values[0]
 
-            # Add fingerprinted properties.
-            if isinstance(prop.type, NameProperty):
-                fps = prop.type.normalize(values, record)
-                data['fingerprints'].extend(fps)
-
-            # Country codes index.
-            if isinstance(prop.type, CountryProperty):
-                ccs = prop.type.normalize(values, record)
-                data['countries'].extend(ccs)
+            # Add inverted properties. This takes all the properties
+            # of a specific type (names, dates, emails etc.)
+            if prop.type.index_invert:
+                if prop.type.index_invert not in data:
+                    data[prop.type.index_invert] = []
+                norm = prop.type.normalize(values, record)
+                data[prop.type.index_invert].extend(norm)
 
         # pprint(data)
         return data
@@ -148,30 +142,36 @@ class LinkMapper(Mapper):
     def __init__(self, dataset, data):
         super(LinkMapper, self).__init__(dataset, data)
 
-    def to_index(self, record, entities):
+    def to_index(self, record, entities, inverted=False):
         data = super(LinkMapper, self).to_index(record)
+        data['inverted'] = inverted
 
-        # Add entity references for start and end
-        data['entities'] = []
-        for part in ['source', 'target']:
-            name = self.data.get(part)
-            if name not in entities or entities[name] is None:
-                return None
-            entity = entities[name]
-            data[part] = {
-                'id': entity.get('id'),
-                'name': entity.get('name'),
-                'fingerprints': entity.get('fingerprints')
-            }
-            data['fingerprints'].extend(entity.get('fingerprints'))
-            data['entities'].append(entity.get('id'))
+        source, target = self.data.get('source'), self.data.get('target')
+        if inverted:
+            origin, remote = entities.get(target), entities.get(source)
+        else:
+            origin, remote = entities.get(source), entities.get(target)
+
+        if origin is None or remote is None:
+            # If data was missing for either the source or target entity
+            # they will be None, and we should not create a link.
+            return
+
+        # We don't need to index the entity here, since it's already known
+        # in the simplest case (entity profile pages).
+        data['origin'] = {
+            'id': origin.get('id'),
+            'fingerprints': origin.get('fingerprints'),
+        }
+        data['remote'] = remote
 
         # Generate a link ID
         digest = sha1()
+        digest.update(str(inverted))
+        digest.update(origin['id'])
+        digest.update(remote['id'])
         key_digest = self.compute_key(record)
         if key_digest is not None:
             digest.update(key_digest)
-        for entity in data['entities']:
-            digest.update(entity)
         data['id'] = digest.hexdigest()
         return data

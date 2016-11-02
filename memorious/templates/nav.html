@@ -10,7 +10,7 @@
              placeholder="Search all the data">
       {% if query is defined %}
         {% for arg, value in query.items %}
-          {% if arg != 'q' %}
+          {% if arg != query.alias('q') %}
             <input type="hidden" name="{{arg}}" value="{{value}}">
           {% endif %}
         {% endfor %}

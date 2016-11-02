@@ -39,16 +39,13 @@ class LinkResult(ResultDocument):
 
     def __init__(self, document, parent=None):
         super(LinkResult, self).__init__(document, parent=parent)
-        self.source = self.data.get('source')
-        self.target = self.data.get('target')
-        if parent and self.source.get('id') == parent.id:
-            self.other = self.target
-            self.reversed = False
-            self.label = self.schema.forward
-        if parent and self.target.get('id') == parent.id:
-            self.other = self.source
-            self.reversed = True
+        self.remote = self.data.get('remote')
+        self.origin = self.data.get('origin')
+        self.reversed = self.data.get('reversed')
+        if self.reversed:
             self.label = self.schema.reverse
+        else:
+            self.label = self.schema.forward
 
 
 class FacetBucket(object):

@@ -30,8 +30,24 @@ def search_entities(query, auth):
 
 
 def search_links(entity, query, auth):
-    q = {'term': {'entities': entity.id}}
-    q = compose_query(q, query, auth, ['schemata'])
+    q = {'term': {'origin.id': entity.id}}
+    if query.has_text:
+        textq = {
+            'query_string': {
+                'query': query.text,
+                'fields': ['remote.name^6', 'remote.fingerprints^2',
+                           'text', '_all'],
+                'default_operator': 'AND',
+                'use_dis_max': True
+            }
+        }
+        q = {
+            'bool': {
+                'must': [q, textq]
+            }
+        }
+
+    q = compose_query(q, query, auth, ['schemata', 'remote.countries'])
     result = es.search(index=es_index, doc_type=Schema.LINK, body=q)
     return ResultSet(query, result, parent=entity)
 

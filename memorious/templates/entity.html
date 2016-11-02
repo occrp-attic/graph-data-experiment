@@ -44,7 +44,22 @@
           {{ macros.facet(links.query, facet) }}
         {% endfor %}
       </div>
-      <div class="col-md-9">   
+      <div class="col-md-9">
+        <form>
+          <div class="form-group">
+            <input class="form-control" name="{{ links.query.alias('q') }}"
+                   value="{{ links.query.text }}"
+                   placeholder="Search relationships">
+            {% if links.query is defined %}
+              {% for arg, value in links.query.items %}
+                {% if arg != links.query.alias('q') %}
+                  <input type="hidden" name="{{arg}}" value="{{value}}">
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </form>
+
         <table class="table table-condensed">
           <tr>
             <th>Type</th>
@@ -59,8 +74,8 @@
                 {{link.label}}
               </td>
               <td>
-                <a href="{{url_for('base.entity', entity_id=link.other.id)}}">
-                  {{link.other.name}}
+                <a href="{{url_for('base.entity', entity_id=link.remote.id)}}">
+                  {{link.remote.name}}
                 </a>
               </td>
               <td>

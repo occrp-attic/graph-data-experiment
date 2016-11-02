@@ -23,9 +23,10 @@ class Record(dict):
                 yield (Schema.ENTITY, entities[entity.name])
 
         for link in self.dataset.links:
-            data = link.to_index(record, entities)
-            if data is not None:
-                yield (Schema.LINK, data)
+            for inverted in [True, False]:
+                data = link.to_index(record, entities, inverted=inverted)
+                if data is not None:
+                    yield (Schema.LINK, data)
 
     def __repr__(self):
         return '<Record(%r)>' % (self.dataset)
