@@ -12,14 +12,20 @@ class StringProperty(object):
         self.prop = prop
 
     def clean(self, value, record):
+        if value is None:
+            return None
         value = six.text_type(value).strip()
+        if not len(value):
+            return None
         return value
 
     def normalize(self, values, record):
+        results = []
         for value in values:
             value = self.normalize_value(value, record)
             if value is not None:
-                yield value
+                results.append(value)
+        return set(results)
 
     def normalize_value(self, value, record):
         return self.clean(value, record)
@@ -29,6 +35,12 @@ class NameProperty(StringProperty):
 
     def normalize_value(self, value, record):
         return fingerprints.generate(value)
+
+
+class DateProperty(StringProperty):
+
+    def normalize_value(self, value, record):
+        return value
 
 
 class CountryProperty(StringProperty):
@@ -81,6 +93,7 @@ def resolve_type(name):
     types = {
         'string': StringProperty,
         'name': NameProperty,
+        'date': DateProperty,
         'country': CountryProperty,
         'address': AddressProperty,
         'phone': PhoneProperty,

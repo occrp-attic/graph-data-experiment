@@ -31,17 +31,20 @@ class MapperProperty(object):
             self.template = self.compiler.compile(six.text_type(self.format))
 
     def get_values(self, record):
-        if self.literal is not None:
-            return [self.literal]
+        values = []
         if self.format is not None:
-            return [self.template(record)]
-        return [record.get(r) for r in self.refs]
+            values.append(self.template(record))
+        else:
+            for r in self.refs:
+                values.append(record.get(r))
+        values.append(self.literal)
+        values = [self.type.clean(v, record) for v in values]
+        return list(set([v for v in values if v is not None]))
 
     def get_value(self, record):
         # select the first non-null value by default
         for value in self.get_values(record):
-            if value is not None:
-                return value
+            return value
 
 
 class Mapper(object):

@@ -26,6 +26,16 @@
     </div>
   {% endif %}
 
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      Source:
+      <a href="{{entity.dataset.info_url}}" target="_blank">
+        {{entity.dataset.label}}
+      </a>
+    </div>
+  </div>
+
   {% if links.total %}
     {{ macros.subheader("Relationships") }}
     <div class="row">
@@ -39,6 +49,9 @@
           <tr>
             <th>Type</th>
             <th>Entity</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Details</th>
           </tr>
           {% for link in links %}
             <tr>
@@ -49,6 +62,15 @@
                 <a href="{{url_for('base.entity', entity_id=link.other.id)}}">
                   {{link.other.name}}
                 </a>
+              </td>
+              <td>
+                {{link.properties.startDate | first }}
+              </td>
+              <td>
+                {{link.properties.endDate | first }}
+              </td>
+              <td>
+                {{link.properties.summary | first }}
               </td>
             </tr>
           {% endfor %}

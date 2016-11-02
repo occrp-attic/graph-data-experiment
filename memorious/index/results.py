@@ -14,6 +14,7 @@ class ResultDocument(object):
         self.properties = self.data.get('properties')
         self.schema = model.get_schema(document.get('_type'),
                                        self.data.get('schema'))
+        self.dataset = model.get_dataset(self.data.get('dataset'))
 
     def list_properties(self):
         listed = []
