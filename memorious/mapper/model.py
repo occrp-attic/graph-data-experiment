@@ -4,6 +4,13 @@ from memorious.mapper.auth import Group
 
 
 class Model(object):
+    """A data model for a memorious instance.
+
+    Only one model is active at any time, and it is typically read from a
+    YAML or JSON file. It hosts the schema definition (entity and link
+    models) for the instance, authorization groups and, most importantly,
+    the datasets defined for import.
+    """
 
     def __init__(self, data):
         self.data = data

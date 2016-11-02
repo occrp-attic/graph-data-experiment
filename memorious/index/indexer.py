@@ -2,9 +2,10 @@ import logging
 from elasticsearch.helpers import bulk, scan
 
 from memorious.core import es, es_index
-from memorious.util import DATA_PAGE
+from memorious.util import DATA_PAGE, chunk_iter, is_list, remove_nulls
 
 log = logging.getLogger(__name__)
+INDEX_PAGE = 1000
 
 
 def _dataset_iter(dataset):
@@ -32,9 +33,50 @@ def _dataset_iter(dataset):
             row_idx += 1
 
 
+def merge_doc_objects(old, new):
+    """Exend the values of the new doc with extra values from the old."""
+    old = remove_nulls(old)
+    new = remove_nulls(new)
+    for k, v in old.items():
+        if k in new:
+            if is_list(v):
+                v = new[k] + v
+                new[k] = list(set(v))
+            elif isinstance(v, dict):
+                new[k] = merge_doc_objects(v, new[k])
+        else:
+            new[k] = v
+    return new
+
+
+def _index_updates(dataset):
+    """Look up existing index documents and generate an updated form.
+
+    This is necessary to make the index accumulative, i.e. if an entity or link
+    gets indexed twice with different field values, it'll add up the different
+    field values into a single record. This is to avoid overwriting the
+    document and losing field values. An alternative solution would be to
+    implement this in Groovy on the ES.
+    """
+    for chunk in chunk_iter(_dataset_iter(dataset), INDEX_PAGE):
+        docs = []
+        for doc in chunk:
+            docs.append({
+                '_id': doc['_id'],
+                '_type': doc['_type']
+            })
+        result = es.mget(index=es_index, body={'docs': docs})
+        for new_doc, idx_doc in zip(chunk, result.get('docs')):
+            assert new_doc['_id'] == idx_doc['_id']
+            idx_doc.pop('_version', None)
+            if idx_doc.pop('found', False):
+                new_doc = merge_doc_objects(idx_doc, new_doc)
+            yield new_doc
+
+
 def index_dataset(dataset):
-    bulk(es, _dataset_iter(dataset), stats_only=True,
-         chunk_size=DATA_PAGE / 10.0, request_timeout=200.0)
+    bulk(es, _index_updates(dataset), stats_only=True,
+         chunk_size=INDEX_PAGE, request_timeout=200.0)
     optimize_search()
 
 

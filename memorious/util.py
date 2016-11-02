@@ -35,11 +35,15 @@ def load_config_file(file_path):
     return resolve_includes(file_path, data)
 
 
+def is_list(obj):
+    return isinstance(obj, (list, tuple, set))
+
+
 def ensure_list(obj):
     """Make the returned object a list, otherwise wrap as single item."""
     if obj is None:
         return []
-    if not isinstance(obj, (list, tuple, set)):
+    if not is_list(obj):
         return [obj]
     return obj
 
@@ -50,3 +54,27 @@ def dict_list(data, *keys):
         if key in data:
             return ensure_list(data[key])
     return []
+
+
+def chunk_iter(iterable, size):
+    """Turn an iterator into a set of smaller lists."""
+    chunk = []
+    for el in iterable:
+        chunk.append(el)
+        if len(chunk) >= size:
+            yield chunk
+            chunk = []
+    if len(chunk):
+        yield chunk
+
+
+def remove_nulls(data):
+    """Remove None from an object, recursively."""
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if v is None:
+                data.pop(k)
+            data[k] = remove_nulls(v)
+    elif is_list(data):
+        data = [remove_nulls(d) for d in data if d is not None]
+    return data
