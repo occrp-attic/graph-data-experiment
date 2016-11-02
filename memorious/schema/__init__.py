@@ -6,7 +6,7 @@ class SchemaProperty(object):
 
     def __init__(self, schema, name, data):
         self.schema = schema
-        self.name = name
+        self.name = name.strip()
         self.data = data
         self.label = data.get('label', name)
         self.is_hidden = data.get('hidden', False)

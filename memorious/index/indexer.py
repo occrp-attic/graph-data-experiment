@@ -2,6 +2,7 @@ import logging
 from elasticsearch.helpers import bulk, scan
 
 from memorious.core import es, es_index
+from memorious.schema import Schema
 from memorious.util import DATA_PAGE, chunk_iter, is_list, remove_nulls
 
 log = logging.getLogger(__name__)
@@ -59,14 +60,20 @@ def _index_updates(dataset):
     implement this in Groovy on the ES.
     """
     for chunk in chunk_iter(_dataset_iter(dataset), INDEX_PAGE):
-        docs = []
+        query_docs, new_docs = [], []
         for doc in chunk:
-            docs.append({
-                '_id': doc['_id'],
-                '_type': doc['_type']
-            })
-        result = es.mget(index=es_index, body={'docs': docs})
-        for new_doc, idx_doc in zip(chunk, result.get('docs')):
+            # Slight hack: no need to upsert links, the problem (AFAIK) only
+            # exists for entities.
+            if doc.get('_type') == Schema.LINK:
+                yield doc
+            else:
+                query_docs.append({
+                    '_id': doc['_id'],
+                    '_type': doc['_type']
+                })
+                new_docs.append(doc)
+        result = es.mget(index=es_index, body={'docs': query_docs})
+        for new_doc, idx_doc in zip(new_docs, result.get('docs')):
             assert new_doc['_id'] == idx_doc['_id']
             idx_doc.pop('_version', None)
             if idx_doc.pop('found', False):
