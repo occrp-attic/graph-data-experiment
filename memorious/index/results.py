@@ -41,8 +41,8 @@ class LinkResult(ResultDocument):
         super(LinkResult, self).__init__(document, parent=parent)
         self.remote = self.data.get('remote')
         self.origin = self.data.get('origin')
-        self.reversed = self.data.get('reversed')
-        if self.reversed:
+        self.inverted = self.data.get('inverted')
+        if self.inverted:
             self.label = self.schema.reverse
         else:
             self.label = self.schema.forward
