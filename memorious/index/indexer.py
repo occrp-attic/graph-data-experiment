@@ -3,7 +3,8 @@ from elasticsearch.helpers import bulk, scan
 
 from memorious.core import es, es_index
 from memorious.model import Schema
-from memorious.util import DATA_PAGE, chunk_iter, is_list, remove_nulls
+from memorious.util import DATA_PAGE, unique_list
+from memorious.util import chunk_iter, is_list, remove_nulls
 
 log = logging.getLogger(__name__)
 INDEX_PAGE = 1000
@@ -43,7 +44,7 @@ def merge_doc_objects(old, new):
         if k in new:
             if is_list(v):
                 v = new[k] + v
-                new[k] = list(set(v))
+                new[k] = unique_list(v)
             elif isinstance(v, dict):
                 new[k] = merge_doc_objects(v, new[k])
         else:

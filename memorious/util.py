@@ -42,6 +42,15 @@ def is_list(obj):
     return isinstance(obj, (list, tuple, set))
 
 
+def unique_list(lst):
+    """Make a list unique, retaining order of initial appearance."""
+    uniq = []
+    for item in lst:
+        if item not in uniq:
+            uniq.append(item)
+    return uniq
+
+
 def clean_text(text):
     """Apply some very simple cleaning operations to a piece of text."""
     if text is None:

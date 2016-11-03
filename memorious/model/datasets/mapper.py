@@ -4,7 +4,7 @@ from pprint import pprint  # noqa
 
 from memorious.model.schema import Schema
 from memorious.model.datasets.formatting import Formatter
-from memorious.util import dict_list
+from memorious.util import dict_list, unique_list
 
 
 class MapperProperty(object):
@@ -17,23 +17,29 @@ class MapperProperty(object):
         self.type = schema.type_cls(self)
         self.refs = dict_list(data, 'column', 'columns')
         self.literal = data.get('literal')
+        self.join = data.get('join')
 
         # this is hacky, trying to generate refs from template
-        self.format = data.get('format')
-        if self.format is not None:
-            self.formatter = Formatter(self.format)
+        self.template = data.get('template')
+        if self.template is not None:
+            self.formatter = Formatter(self.template)
             self.refs.extend(self.formatter.refs)
 
     def get_values(self, record):
         values = []
-        if self.format is not None:
+        if self.template is not None:
             values.append(self.formatter.apply(record))
         else:
             for r in self.refs:
                 values.append(record.get(r))
         values.append(self.literal)
         values = [self.type.clean(v, record) for v in values]
-        return list(set([v for v in values if v is not None]))
+        values = [v for v in values if v is not None]
+
+        if self.join is not None:
+            values = [self.join.join(values)]
+
+        return unique_list(values)
 
     def get_value(self, record):
         # Select the first non-null value by default (like SQL COALESCE())
