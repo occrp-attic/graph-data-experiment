@@ -1,16 +1,13 @@
-import re
 import six
 from hashlib import sha1
-from pybars import Compiler
 from pprint import pprint  # noqa
 
 from memorious.schema import Schema
+from memorious.mapper.formatting import Formatter
 from memorious.util import dict_list
 
 
 class MapperProperty(object):
-    FORMAT_PATTERN = re.compile('{{([^(}})]*)}}')
-    compiler = Compiler()
 
     def __init__(self, mapper, name, data, schema):
         self.mapper = mapper
@@ -24,15 +21,13 @@ class MapperProperty(object):
         # this is hacky, trying to generate refs from template
         self.format = data.get('format')
         if self.format is not None:
-            for ref in self.FORMAT_PATTERN.findall(self.format):
-                self.refs.append(ref)
-            # compile the format string into a handlebars template
-            self.template = self.compiler.compile(six.text_type(self.format))
+            self.formatter = Formatter(self.format)
+            self.refs.extend(self.formatter.refs)
 
     def get_values(self, record):
         values = []
         if self.format is not None:
-            values.append(self.template(record))
+            values.append(self.formatter.apply(record))
         else:
             for r in self.refs:
                 values.append(record.get(r))
@@ -77,25 +72,25 @@ class Mapper(object):
     def compute_key(self, record):
         if not len(self.keys):
             return None
-        digest = sha1(self.dataset.name.encode('utf-8'))
+        digest = sha1(self.query.dataset.name.encode('utf-8'))
         # digest.update(self.schema.name.encode('utf-8'))
-        has_value = False
         for key in self.keys:
             value = record.get(key)
-            if value is not None:
-                value = unicode(value).encode('utf-8')
-                digest.update(value)
-                has_value = True
-        if has_value:
-            return digest.hexdigest()
+            if value is None:
+                return
+            value = six.text_type(value)
+            if not len(value.strip()):
+                return
+            digest.update(value.encode('utf-8'))
+        return digest.hexdigest()
 
     def to_index(self, record):
         # TODO make sure record and properties is typecast to strings
         return {
             'schema': self.schema.name,
             'schemata': list(self.schema.schemata),
-            'dataset': self.dataset.name,
-            'groups': self.dataset.groups,
+            'dataset': self.query.dataset.name,
+            'groups': self.query.dataset.groups,
             'properties': self.compute_properties(record),
             'text': record.text
         }
@@ -104,9 +99,9 @@ class Mapper(object):
 class EntityMapper(Mapper):
     section = Schema.ENTITY
 
-    def __init__(self, dataset, name, data):
+    def __init__(self, query, name, data):
         self.name = name
-        super(EntityMapper, self).__init__(dataset, data)
+        super(EntityMapper, self).__init__(query, data)
 
         if not len(self.keys):
             raise TypeError("No key column(s) defined: %s" % name)
@@ -115,6 +110,8 @@ class EntityMapper(Mapper):
         data = super(EntityMapper, self).to_index(record)
         properties = data['properties']
         data['id'] = self.compute_key(record)
+        if not data['id']:
+            return
 
         for prop in self.properties:
             values = properties.get(prop.name)
@@ -138,8 +135,8 @@ class EntityMapper(Mapper):
 class LinkMapper(Mapper):
     section = Schema.LINK
 
-    def __init__(self, dataset, data):
-        super(LinkMapper, self).__init__(dataset, data)
+    def __init__(self, query, data):
+        super(LinkMapper, self).__init__(query, data)
 
     def to_index(self, record, entities, inverted=False):
         data = super(LinkMapper, self).to_index(record)

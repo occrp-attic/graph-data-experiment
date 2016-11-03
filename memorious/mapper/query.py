@@ -1,5 +1,6 @@
 import six
 import logging
+from uuid import uuid4
 from sqlalchemy import select
 from sqlalchemy.schema import Table
 
@@ -24,33 +25,15 @@ class QueryTable(object):
         self.table = Table(self.table_ref, meta, autoload=True)
         self.alias = self.table.alias(self.alias_ref)
 
-    @property
-    def refs(self):
-        if not hasattr(self, '_refs'):
-            self._refs = {}
-            for column in self.alias.columns:
-                name = '%s.%s' % (self.alias_ref, column.name)
-                self._refs[name] = column
-                self._refs[column.name] = column
-        return self._refs
+        self.refs = {}
+        for column in self.alias.columns:
+            name = '%s.%s' % (self.alias_ref, column.name)
+            labeled_column = column.label('col_%s' % uuid4().get_hex()[:10])
+            self.refs[name] = labeled_column
+            self.refs[column.name] = labeled_column
 
     def __repr__(self):
         return '<QueryTable(%r,%r)>' % (self.alias_ref, self.table_ref)
-
-
-class QueryField(object):
-    """A field to be included in loaded data."""
-
-    def __init__(self, query, data):
-        self.query = query
-        self.data = data
-        self.label = data.get('label', self.column_ref)
-        self.column_ref = data.get('column')
-        self.column = query.get_column(self.column_ref)
-        self.table = query.get_table(self.column_ref)
-
-    def __repr__(self):
-        return '<QueryField(%r)>' % self.column_ref
 
 
 class Query(object):
@@ -62,7 +45,6 @@ class Query(object):
 
         tables = data.get('tables', [data.get('table')])
         self.tables = [QueryTable(self, f) for f in tables]
-        self.fields = [QueryField(self, f) for f in data.get('fields', [])]
 
         self.entities = []
         for ename, edata in data.get('entities').items():
@@ -89,17 +71,21 @@ class Query(object):
         return [t.alias for t in self.tables]
 
     @property
+    def active_refs(self):
+        refs = set()
+        for item in self.entities + self.links:
+            for ref in item.refs:
+                refs.add(ref)
+        return refs
+
+    @property
     def mapped_columns(self):
         """Determine which columns must be selected.
 
         This will check entity and link mappings for the set of columns
         actually used in order to avoid loading superfluous data.
         """
-        refs = set()
-        for item in self.entities + self.links:
-            for ref in item.refs:
-                refs.add(ref)
-        return [self.get_column(r) for r in refs]
+        return [self.get_column(r) for r in self.active_refs]
 
     def apply_filters(self, q):
         for col, val in self.data.get('filters', {}).items():
@@ -111,21 +97,29 @@ class Query(object):
         return q
 
     def compose_query(self):
-        q = select(columns=self.mapped_columns, from_obj=self.from_clause)
+        q = select(columns=self.mapped_columns, from_obj=self.from_clause,
+                   use_labels=True)
         q = self.apply_filters(q)
         return q
 
     def iterrecords(self):
         """Compose the actual query and return an iterator of ``Record``."""
+        mapping = {self.get_column(r).name: r for r in self.active_refs}
+
         q = self.compose_query()
-        log.info("Query [%s]: %s", self.name, q)
+        log.info("Query [%s]: %s", self.dataset.name, q)
         rp = engine.execute(q)
+        log.info("Query executed, loading data...")
         while True:
             rows = rp.fetchmany(DATA_PAGE)
             if not len(rows):
                 break
             for row in rows:
-                yield Record(self, row)
+                data = {}
+                for k, v in row.items():
+                    k = mapping.get(k, k)
+                    data[k] = v
+                yield Record(self, data)
 
     def __repr__(self):
         return '<Query(%s)>' % self.compose_query()
