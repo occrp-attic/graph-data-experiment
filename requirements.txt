@@ -9,7 +9,6 @@ https://github.com/pudo/fingerprints/tarball/master
 https://github.com/occrp/countrynames/tarball/master
 pyyaml
 cryptography
-pip
 flanker
 phonenumbers
 elasticsearch==2.3.0

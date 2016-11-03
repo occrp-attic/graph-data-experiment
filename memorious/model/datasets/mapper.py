@@ -4,7 +4,7 @@ from pprint import pprint  # noqa
 
 from memorious.model.schema import Schema
 from memorious.model.datasets.formatting import Formatter
-from memorious.util import dict_list, unique_list
+from memorious.util import dict_list, unique_list, clean_text
 
 
 class MapperProperty(object):
@@ -85,11 +85,8 @@ class Mapper(object):
         digest = sha1(self.query.dataset.name.encode('utf-8'))
         # digest.update(self.schema.name.encode('utf-8'))
         for key in self.keys:
-            value = record.get(key)
+            value = clean_text(record.get(key))
             if value is None:
-                return
-            value = six.text_type(value)
-            if not len(value.strip()):
                 return
             digest.update(value.encode('utf-8'))
         return digest.hexdigest()

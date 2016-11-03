@@ -90,8 +90,8 @@ class Query(object):
     def apply_filters(self, q):
         for col, val in self.data.get('filters', {}).items():
             q = q.where(self.get_column(col) == val)
-        # for col, val in self.data.get('filters_not', {}).items():
-        #     q = q.where(not_(self.get_column(col) == val))
+        for col, val in self.data.get('filters_not', {}).items():
+            q = q.where(self.get_column(col) != val)
         # not sure this is a great idea:
         if self.data.get('where'):
             q = q.where(sql_text(self.data.get('where')))
