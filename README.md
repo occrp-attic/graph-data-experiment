@@ -22,6 +22,8 @@ emporium - table metadata layer
 
 * URL, Date and Identifier types
 * Entity overlap collector
+* Fingerprint/dataset index type
+* Type rendering
 * [done] Script command
 * [done] Figure out multi-view code
 * [done] Entity profile page
