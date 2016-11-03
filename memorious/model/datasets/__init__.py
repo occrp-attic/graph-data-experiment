@@ -1,7 +1,7 @@
 import six
 import logging
 
-from memorious.mapper.query import Query
+from memorious.model.datasets.query import Query
 from memorious.util import dict_list
 
 log = logging.getLogger(__name__)

@@ -1,13 +1,13 @@
 import six
 import logging
 from uuid import uuid4
-from sqlalchemy import select
+from sqlalchemy import select, text as sql_text
 from sqlalchemy.schema import Table
 
 from memorious.core import meta, engine
 from memorious.util import DATA_PAGE
-from memorious.mapper.mapper import EntityMapper, LinkMapper
-from memorious.mapper.record import Record
+from memorious.model.datasets.mapper import EntityMapper, LinkMapper
+from memorious.model.datasets.record import Record
 
 log = logging.getLogger(__name__)
 
@@ -90,6 +90,11 @@ class Query(object):
     def apply_filters(self, q):
         for col, val in self.data.get('filters', {}).items():
             q = q.where(self.get_column(col) == val)
+        # for col, val in self.data.get('filters_not', {}).items():
+        #     q = q.where(not_(self.get_column(col) == val))
+        # not sure this is a great idea:
+        if self.data.get('where'):
+            q = q.where(sql_text(self.data.get('where')))
         for join in self.data.get('joins', []):
             left = self.get_column(join.get('left'))
             right = self.get_column(join.get('right'))
@@ -122,4 +127,4 @@ class Query(object):
                 yield Record(self, data)
 
     def __repr__(self):
-        return '<Query(%s)>' % self.compose_query()
+        return '<Query(%s)>' % self.dataset

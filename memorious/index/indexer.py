@@ -2,7 +2,7 @@ import logging
 from elasticsearch.helpers import bulk, scan
 
 from memorious.core import es, es_index
-from memorious.schema import Schema
+from memorious.model import Schema
 from memorious.util import DATA_PAGE, chunk_iter, is_list, remove_nulls
 
 log = logging.getLogger(__name__)

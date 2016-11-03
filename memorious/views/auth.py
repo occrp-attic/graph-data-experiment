@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 
 from memorious.core import url_for, oauth_provider, model
 from memorious.views.util import is_safe_url
-from memorious.mapper.auth import Auth
+from memorious.model.groups import Auth
 
 
 log = logging.getLogger(__name__)

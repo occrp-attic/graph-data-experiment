@@ -1,6 +1,6 @@
-from memorious.schema import Schema
-from memorious.mapper.dataset import Dataset
-from memorious.mapper.auth import Group
+from memorious.model.schema import Schema
+from memorious.model.datasets import Dataset
+from memorious.model.groups import Group
 
 
 class Model(object):

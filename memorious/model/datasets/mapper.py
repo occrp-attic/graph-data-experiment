@@ -2,8 +2,8 @@ import six
 from hashlib import sha1
 from pprint import pprint  # noqa
 
-from memorious.schema import Schema
-from memorious.mapper.formatting import Formatter
+from memorious.model.schema import Schema
+from memorious.model.datasets.formatting import Formatter
 from memorious.util import dict_list
 
 
@@ -129,13 +129,14 @@ class EntityMapper(Mapper):
 
             # Add inverted properties. This takes all the properties
             # of a specific type (names, dates, emails etc.)
-            if prop.type.index_invert:
-                if prop.type.index_invert not in data:
-                    data[prop.type.index_invert] = []
-                norm = prop.type.normalize(values, record)
-                data[prop.type.index_invert].extend(norm)
+            invert = prop.type.index_invert
+            if invert:
+                if invert not in data:
+                    data[invert] = []
+                for norm in prop.type.normalize(values, record):
+                    if norm not in data[invert]:
+                        data[invert].append(norm)
 
-        # pprint(data)
         return data
 
 

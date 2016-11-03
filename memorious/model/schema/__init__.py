@@ -1,4 +1,4 @@
-from memorious.schema.types import resolve_type
+from memorious.model.schema.types import resolve_type
 from memorious.util import dict_list
 
 

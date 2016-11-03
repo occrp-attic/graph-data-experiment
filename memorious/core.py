@@ -71,7 +71,7 @@ def get_metadata():
 def get_model():
     app = current_app._get_current_object()
     if not hasattr(app, '_lg_model'):
-        from memorious.mapper.model import Model
+        from memorious.model import Model
         model_config = get_config('MODEL_YAML', 'model.yaml')
         app._lg_model = Model(load_config_file(model_config))
     return app._lg_model

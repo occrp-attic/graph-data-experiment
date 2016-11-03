@@ -1,7 +1,10 @@
 import math
+import logging
 
 from memorious.core import model
-from memorious.schema import Schema
+from memorious.model import Schema
+
+log = logging.getLogger(__name__)
 
 
 class ResultDocument(object):
@@ -19,7 +22,11 @@ class ResultDocument(object):
     def list_properties(self):
         listed = []
         for name, values in self.properties.items():
-            prop = self.schema.get(name)
+            try:
+                prop = self.schema.get(name)
+            except ValueError as ve:
+                log.info("Invalid property: %s", ve)
+                continue
             if not prop.is_hidden and len(values):
                 listed.append((prop, values))
         return sorted(listed, key=lambda (p, v): p.label)

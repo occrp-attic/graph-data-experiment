@@ -1,6 +1,6 @@
 import six
 
-from memorious.schema import Schema
+from memorious.model.schema import Schema
 
 
 class Record(dict):
