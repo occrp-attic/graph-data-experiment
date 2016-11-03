@@ -2,28 +2,15 @@
 
 emporium - table metadata layer
 
-```json
-{
-    "id": "9044908535898430980934589043095",
-    "type": "legal_entity",
-    "name": "Mr. Fancy Pants",
-    "identifiers": ['', ''],
-    "fingerprints": ['', ''],
-    "addresses": [],
-    "countries": [],
-    "links": [],
-    "properties": {},
-    "record": {}
-}
-```
-
 
 ### TODO
 
-* URL, Date and Identifier types
+* [done] URL, Date and Identifier types
 * Entity overlap collector
 * Fingerprint/dataset index type
+* Facet length expander
 * Type rendering
+* FA Icons
 * [done] Script command
 * [done] Figure out multi-view code
 * [done] Entity profile page

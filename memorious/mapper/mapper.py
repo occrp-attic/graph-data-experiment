@@ -40,6 +40,10 @@ class MapperProperty(object):
         for value in self.get_values(record):
             return value
 
+    def __repr__(self):
+        return '<MapperProperty(%r, %r, %r)>' % (self.mapper, self.name,
+                                                 self.schema)
+
 
 class Mapper(object):
 
@@ -94,6 +98,9 @@ class Mapper(object):
             'properties': self.compute_properties(record),
             'text': record.text
         }
+
+    def __repr__(self):
+        return '<Mapper(%r)>' % self.query
 
 
 class EntityMapper(Mapper):

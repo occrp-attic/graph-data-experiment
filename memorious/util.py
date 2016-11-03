@@ -1,8 +1,11 @@
 import os
+import re
+import six
 import yaml
 
 
 DATA_PAGE = 10000
+WS_PATTERN = re.compile('\s+')
 
 
 def resolve_includes(file_path, data):
@@ -37,6 +40,17 @@ def load_config_file(file_path):
 
 def is_list(obj):
     return isinstance(obj, (list, tuple, set))
+
+
+def clean_text(text):
+    """Apply some very simple cleaning operations to a piece of text."""
+    if text is None:
+        return None
+    text = six.text_type(text)
+    text = WS_PATTERN.sub(' ', text).strip()
+    if not len(text):
+        return None
+    return text
 
 
 def ensure_list(obj):

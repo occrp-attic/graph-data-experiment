@@ -2,7 +2,6 @@ import re
 import six
 
 FORMAT_PATTERN = re.compile('{{([^(}})]*)}}')
-WS_PATTERN = re.compile('\s+')
 
 
 class Formatter(object):
@@ -20,7 +19,4 @@ class Formatter(object):
         value = six.text_type(self.format)
         for repl, ref in self.replacements.items():
             value = value.replace(repl, record.get(ref))
-        value = WS_PATTERN.sub(' ', value).strip()
-        if not len(value):
-            return
         return value

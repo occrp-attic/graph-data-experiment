@@ -1,9 +1,13 @@
-import six
+import re
+import dateparser
 import fingerprints
 import countrynames
+from datetime import datetime
 from flanker.addresslib import address
 import phonenumbers
 from phonenumbers.phonenumberutil import NumberParseException
+
+from memorious.util import clean_text
 
 
 class StringProperty(object):
@@ -13,63 +17,74 @@ class StringProperty(object):
         self.prop = prop
 
     def clean(self, value, record):
-        if value is None:
-            return None
-        value = six.text_type(value).strip()
-        if not len(value):
-            return None
-        return value
+        return clean_text(value)
 
     def normalize(self, values, record):
         results = []
         for value in values:
-            value = self.normalize_value(value, record)
-            if value is not None:
-                results.append(value)
+            for value in self.normalize_value(value, record):
+                if value is not None:
+                    results.append(value)
         return set(results)
 
     def normalize_value(self, value, record):
-        return self.clean(value, record)
+        return [self.clean(value, record)]
 
 
 class NameProperty(StringProperty):
     index_invert = 'fingerprints'
 
     def normalize_value(self, value, record):
-        return fingerprints.generate(value)
+        return [fingerprints.generate(value)]
+
+
+class URLProperty(StringProperty):
+    index_invert = None
 
 
 class DateProperty(StringProperty):
     index_invert = 'dates'
 
     def normalize_value(self, value, record):
-        return value
+        date_format = self.prop.data.get('format')
+        if date_format is not None:
+            try:
+                date = datetime.strptime(value, date_format)
+                return [date.date().isoformat()]
+            except:
+                return []
+        else:
+            date = dateparser.parse(value)
+            if date is not None:
+                return [date.date().isoformat()]
+        return []
 
 
 class CountryProperty(StringProperty):
     index_invert = 'countries'
 
     def normalize_value(self, value, record):
-        return countrynames.to_code(value)
+        return [countrynames.to_code(value)]
 
 
 class AddressProperty(StringProperty):
     index_invert = 'addresses'
 
     def normalize_value(self, value, record):
-        return value
+        return [value]
 
 
 class PhoneProperty(StringProperty):
     index_invert = 'phones'
-    FORMAT = phonenumbers.PhoneNumberFormat.INTERNATIONAL
+    FORMAT = phonenumbers.PhoneNumberFormat.E164
 
     def get_countries(self, record):
         """Find the country references on this record."""
-        countries = [None]
-        for prop in self.prop.mapper.properties:
-            if isinstance(prop.type, CountryProperty):
-                countries.extend(prop.type.normalize(None, record))
+        countries = [self.prop.data.get('country')]
+        if countries[0] is None:
+            for prop in self.prop.mapper.properties:
+                if isinstance(prop.type, CountryProperty):
+                    countries.extend(prop.type.normalize(None, record))
         return countries
 
     def normalize_value(self, value, record):
@@ -78,8 +93,8 @@ class PhoneProperty(StringProperty):
                 num = phonenumbers.parse(value, country)
                 if phonenumbers.is_possible_number(num):
                     if phonenumbers.is_valid_number(num):
-                        # TODO: allow multiple?
-                        return phonenumbers.format_number(num, self.FORMAT)
+                        num = phonenumbers.format_number(num, self.FORMAT)
+                        yield num
             except NumberParseException:
                 # TODO do we want to log this?
                 pass
@@ -88,11 +103,24 @@ class PhoneProperty(StringProperty):
 class EmailProperty(StringProperty):
     index_invert = 'emails'
 
-    def normalize(self, value, record):
-        for value in self.prop.get_values(record):
-            parsed = address.parse(value)
-            if parsed is not None:
-                yield parsed.address
+    def normalize_value(self, value, record):
+        parsed = address.parse(value)
+        if parsed is not None:
+            return [parsed.address]
+
+
+class IdentiferProperty(StringProperty):
+    index_invert = 'fingerprints'
+    clean_re = re.compile('[^a-zA-Z0-9]*')
+
+    def normalize_value(self, value, record):
+        scheme = self.prop.data.get('scheme')
+        if scheme is None:
+            raise TypeError("No scheme given for: %s", self.prop)
+        value = self.clean_re.sub('', value).upper()
+        if not len(value):
+            return []
+        return ['%s:%s' % (scheme, value)]
 
 
 def resolve_type(name):
@@ -104,7 +132,10 @@ def resolve_type(name):
         'country': CountryProperty,
         'address': AddressProperty,
         'phone': PhoneProperty,
-        'email': EmailProperty
+        'email': EmailProperty,
+        'url': URLProperty,
+        'uri': URLProperty,
+        'identifier': IdentiferProperty
     }
     type_ = types.get(name.strip().lower())
     if type_ is None:
