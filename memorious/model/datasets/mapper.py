@@ -1,4 +1,3 @@
-import six
 from hashlib import sha1
 from pprint import pprint  # noqa
 
@@ -16,7 +15,7 @@ class MapperProperty(object):
         self.schema = schema
         self.type = schema.type_cls(self)
         self.refs = dict_list(data, 'column', 'columns')
-        self.literal = data.get('literal')
+        self.literals = dict_list(data, 'literal', 'literals')
         self.join = data.get('join')
 
         # this is hacky, trying to generate refs from template
@@ -32,7 +31,7 @@ class MapperProperty(object):
         else:
             for r in self.refs:
                 values.append(record.get(r))
-        values.append(self.literal)
+        values.extend(self.literals)
         values = [self.type.clean(v, record) for v in values]
         values = [v for v in values if v is not None]
 
