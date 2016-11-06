@@ -64,8 +64,8 @@ def _index_updates(dataset):
     for chunk in chunk_iter(_dataset_iter(dataset), INDEX_PAGE):
         query_docs, new_docs = [], []
         for doc in chunk:
-            # Slight hack: no need to upsert links, the problem (AFAIK) only
-            # exists for entities.
+            # Slight hack: no need to upsert links, the data merge problem
+            # (AFAIK) only exists for entities.
             if doc.get('_type') == Schema.LINK:
                 yield doc
             else:

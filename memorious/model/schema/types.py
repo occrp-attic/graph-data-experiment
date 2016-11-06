@@ -87,17 +87,25 @@ class PhoneProperty(StringProperty):
                     countries.extend(prop.type.normalize(None, record))
         return countries
 
-    def normalize_value(self, value, record):
-        for country in self.get_countries(record):
-            try:
-                num = phonenumbers.parse(value, country)
-                if phonenumbers.is_possible_number(num):
-                    if phonenumbers.is_valid_number(num):
-                        num = phonenumbers.format_number(num, self.FORMAT)
-                        yield num
-            except NumberParseException:
-                # TODO do we want to log this?
-                pass
+    def normalize(self, values, record):
+        countries = [self.prop.data.get('country')]
+        if countries[0] is None:
+            for prop in self.prop.mapper.properties:
+                if isinstance(prop.type, CountryProperty):
+                    pvalues = prop.get_values(record)
+                    countries.extend(prop.type.normalize(pvalues, record))
+
+        for value in values:
+            for country in countries:
+                try:
+                    num = phonenumbers.parse(value, country)
+                    if phonenumbers.is_possible_number(num):
+                        if phonenumbers.is_valid_number(num):
+                            num = phonenumbers.format_number(num, self.FORMAT)
+                            yield num
+                except NumberParseException:
+                    # TODO do we want to log this?
+                    pass
 
 
 class EmailProperty(StringProperty):

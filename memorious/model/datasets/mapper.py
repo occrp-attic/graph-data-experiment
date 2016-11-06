@@ -40,11 +40,6 @@ class MapperProperty(object):
 
         return unique_list(values)
 
-    def get_value(self, record):
-        # Select the first non-null value by default (like SQL COALESCE())
-        for value in self.get_values(record):
-            return value
-
     def __repr__(self):
         return '<MapperProperty(%r, %r, %r)>' % (self.mapper, self.name,
                                                  self.schema)
