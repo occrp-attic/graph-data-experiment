@@ -16,9 +16,7 @@
         <table class="table table-condensed">
           {% for result in results %}
             <tr>
-              <td width="15%">
-                {{result.schema.label}}
-              </td>
+              <td width="1%">{{ macros.entity_icon(result.schema) }}</td>
               <td>
                 <a href="{{url_for('base.entity', entity_id=result.id)}}">
                   {{result.name}}

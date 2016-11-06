@@ -30,6 +30,14 @@ def entity_schema_label(key):
         return key
 
 
+def entity_schema_icon(key):
+    try:
+        schema = model.get_schema(Schema.ENTITY, key)
+        return schema.icon
+    except Exception:
+        return key
+
+
 def link_schema_label(key):
     try:
         schema = model.get_schema(Schema.LINK, key)

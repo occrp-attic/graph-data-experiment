@@ -34,6 +34,7 @@ class Schema(object):
         self.name = name
         self.data = data
         self.label = data.get('label', name)
+        self.icon = data.get('icon')
         self.is_hidden = data.get('hidden', False)
         self._extends = dict_list(data, 'extends')
         self._own_properties = []

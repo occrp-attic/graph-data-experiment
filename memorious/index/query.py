@@ -5,10 +5,11 @@ from werkzeug.datastructures import MultiDict
 class Facet(object):
     """Describe a facet aggregation."""
 
-    def __init__(self, field, label, label_func=None):
+    def __init__(self, field, label, label_func=None, icon_func=None):
         self.field = field
         self.label = label
         self.label_func = label_func
+        self.icon_func = icon_func
 
 
 class Query(object):
@@ -61,8 +62,10 @@ class Query(object):
             return True
         return False
 
-    def add_facet(self, field, label, label_func=None):
-        self.facets.append(Facet(field, label, label_func=label_func))
+    def add_facet(self, field, label, label_func=None, icon_func=None):
+        self.facets.append(Facet(field, label,
+                                 label_func=label_func,
+                                 icon_func=icon_func))
 
     def has_param(self, arg, value):
         value = unicode(value).encode('utf-8')

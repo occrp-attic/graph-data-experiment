@@ -6,6 +6,7 @@ from memorious.index import search_entities, search_links
 from memorious.index import load_entity, Query
 from memorious.views.util import dataset_label, entity_schema_label
 from memorious.views.util import country_label, link_schema_label
+from memorious.views.util import entity_schema_icon
 
 blueprint = Blueprint('base', __name__)
 log = logging.getLogger(__name__)
@@ -19,7 +20,8 @@ def index():
 @blueprint.route('/search')
 def search():
     query = Query(request.args, path=request.path)
-    query.add_facet('schemata', 'Types', entity_schema_label)
+    query.add_facet('schemata', 'Types', entity_schema_label,
+                    entity_schema_icon)
     query.add_facet('countries', 'Countries', country_label)
     query.add_facet('dataset', 'Dataset', dataset_label)
     results = search_entities(query, request.auth)

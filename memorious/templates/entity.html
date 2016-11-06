@@ -3,7 +3,18 @@
 {% block title %}{{ entity.name }}{% endblock %}
 
 {% block content %} 
-  {{ macros.header(entity.name) }}
+  <div class="row header">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <h2>
+        {{ macros.entity_icon(entity.schema) }}
+        {{ entity.name }}
+        <small>
+          {{ entity.schema.label }}
+        </small>
+      </h2>
+    </div>
+  </div>
 
   {% if entity.has_properties() %}
     {{ macros.subheader("Properties") }}    

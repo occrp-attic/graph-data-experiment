@@ -68,6 +68,11 @@ class FacetBucket(object):
             return self.key
         return self.facet.label_func(self.key)
 
+    @property
+    def icon(self):
+        if self.facet.icon_func is not None:
+            return self.facet.icon_func(self.key)
+
     def __len__(self):
         return self.count
 
