@@ -7,7 +7,6 @@ from sqlalchemy.schema import Table
 from memorious.core import meta, engine
 from memorious.util import DATA_PAGE
 from memorious.model.datasets.mapper import EntityMapper, LinkMapper
-from memorious.model.datasets.record import Record
 
 log = logging.getLogger(__name__)
 
@@ -118,13 +117,14 @@ class Query(object):
         while True:
             rows = rp.fetchmany(DATA_PAGE)
             if not len(rows):
+                log.info("Loading done.")
                 break
             for row in rows:
                 data = {}
                 for k, v in row.items():
                     k = mapping.get(k, k)
                     data[k] = v
-                yield Record(self, data)
+                yield data
 
     def __repr__(self):
         return '<Query(%s)>' % self.dataset

@@ -14,6 +14,7 @@ logging.getLogger('pyelasticsearch').setLevel(logging.WARNING)
 logging.getLogger('elasticsearch').setLevel(logging.WARNING)
 logging.getLogger('assets.cssutils').setLevel(logging.ERROR)
 logging.getLogger('cssutils').setLevel(logging.ERROR)
+logging.getLogger('amqp').setLevel(logging.INFO)
 
 # Log all SQL statements:
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)

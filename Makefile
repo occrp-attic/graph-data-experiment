@@ -1,5 +1,5 @@
 
 
 worker:
-	celery -A memorious.queue -B -c 6 -l INFO worker
+	celery -A memorious.queue -B -c 3 -l INFO worker
 

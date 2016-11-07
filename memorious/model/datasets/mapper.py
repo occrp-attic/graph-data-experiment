@@ -1,3 +1,4 @@
+import six
 from hashlib import sha1
 from pprint import pprint  # noqa
 
@@ -84,6 +85,14 @@ class Mapper(object):
             digest.update(value.encode('utf-8'))
         return digest.hexdigest()
 
+    def compute_text(self, record):
+        text = []
+        for key, value in record.items():
+            if isinstance(value, six.string_types) and len(value.strip()) > 1:
+                text.append(value)
+            # TODO: latin transliteration
+        return text
+
     def to_index(self, record):
         # TODO make sure record and properties is typecast to strings
         return {
@@ -92,7 +101,7 @@ class Mapper(object):
             'dataset': self.query.dataset.name,
             'groups': self.query.dataset.groups,
             'properties': self.compute_properties(record),
-            'text': record.text
+            'text': self.compute_text(record)
         }
 
     def __repr__(self):
@@ -126,12 +135,12 @@ class EntityMapper(Mapper):
             # Add inverted properties. This takes all the properties
             # of a specific type (names, dates, emails etc.)
             type_ = prop.schema.type
-            if type_.invert:
-                if type_.invert not in data:
-                    data[type_.invert] = []
+            if type_.index_invert:
+                if type_.index_invert not in data:
+                    data[type_.index_invert] = []
                 for norm in type_.normalize(values, prop, record):
-                    if norm not in data[type_.invert]:
-                        data[type_.invert].append(norm)
+                    if norm not in data[type_.index_invert]:
+                        data[type_.index_invert].append(norm)
 
         return data
 
