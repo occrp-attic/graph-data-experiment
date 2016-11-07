@@ -55,8 +55,19 @@ footer {
 
 /* Search facets. */
 .table-facets {
+    .facet-header {
+        border-top: 0;
+    }
+    
     .active {
         font-weight: bold;
+    }
+
+    tbody {
+        // max-height: 25vh;
+        // width: inherit;
+        // overflow-y: scroll;
+        // overflow: -moz-scrollbars-vertical;
     }
 }
 
@@ -85,3 +96,6 @@ footer {
     margin-bottom: 1em;
 }
 
+.pagination {
+    margin-top: 0;
+}

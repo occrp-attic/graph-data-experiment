@@ -38,6 +38,17 @@ def load_config_file(file_path):
     return resolve_includes(file_path, data)
 
 
+def chunk_iter(iter, chunk_size):
+    chunk = []
+    for item in iter:
+        chunk.append(item)
+        if len(chunk) >= chunk_size:
+            yield chunk
+            chunk = []
+    if len(chunk):
+        yield chunk
+
+
 def is_list(obj):
     return isinstance(obj, (list, tuple, set))
 

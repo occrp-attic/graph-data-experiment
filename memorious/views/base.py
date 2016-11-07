@@ -3,12 +3,10 @@ from werkzeug.exceptions import NotFound
 from flask import render_template, Blueprint, request
 
 from memorious.index import search_entities, search_links, search_duplicates
-from memorious.index import load_entity, Query
+from memorious.index import load_entity, Query, expand_fingerprints
 from memorious.views.util import dataset_label, entity_schema_label
 from memorious.views.util import country_label, link_schema_label
 from memorious.views.util import entity_schema_icon
-
-from memorious.index.crossref import expand_fingerprints
 
 blueprint = Blueprint('base', __name__)
 log = logging.getLogger(__name__)
@@ -38,9 +36,9 @@ def entity(entity_id):
 
     # load possible duplicates via fingerprint expansion
     fingerprints = expand_fingerprints(entity.fingerprints, request.auth)
-    query = Query(request.args, prefix='duplicates_', path=request.path)
-    # query.add_facet('schemata', 'Types', link_schema_label)
-    query.add_facet('countries', 'Countries', country_label)
+    query = Query(request.args, prefix='duplicates_', path=request.path,
+                  limit=5)
+    # query.add_facet('countries', 'Countries', country_label)
     duplicates = search_duplicates(entity.id, fingerprints, query,
                                    request.auth)
     # load links

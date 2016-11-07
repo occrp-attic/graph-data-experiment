@@ -5,7 +5,7 @@ from sqlalchemy import select, text as sql_text
 from sqlalchemy.schema import Table
 
 from memorious.core import meta, engine
-from memorious.util import DATA_PAGE
+from memorious.util import DATA_PAGE, dict_list
 from memorious.model.datasets.mapper import EntityMapper, LinkMapper
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class Query(object):
         self.dataset = dataset
         self.data = data
 
-        tables = data.get('tables', [data.get('table')])
+        tables = dict_list(data, 'table', 'tables')
         self.tables = [QueryTable(self, f) for f in tables]
 
         self.entities = []

@@ -37,7 +37,7 @@
 
 {% macro pager(results) %}
   {% if results.pages > 1 %}
-    <ul class="pagination">
+    <ul class="pagination pagination-sm">
       <li class="{% if not results.has_prev %}disabled{% endif%}">
         <a href="{{results.prev_url}}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
@@ -59,29 +59,31 @@
 
 
 {% macro facet(query, facet) %}
-  {% if facet.buckets %}
+  {% if facet.show %}
     <table class="table table-condensed table-facets">
       <tr>
-        <th colspan="2">
-          {{facet.label}}
+        <th colspan="2" class="facet-header">
+          {{facet.facet.label}}
         </th>
       </tr>
-      {% for bucket in facet.buckets %}
-        <tr class="{% if query.has_param(facet.field, bucket.key) %}active{% endif %}">
-          <td>
-            {% if bucket.icon %}
-              <i class="fa fa-fw {{bucket.icon}}"></i>
-            {% endif %}
+      <tbody>
+        {% for bucket in facet.buckets %}
+          <tr class="{% if bucket.active %}active{% endif %}">
+            <td>
+              {% if bucket.icon %}
+                <i class="fa fa-fw {{bucket.icon}}"></i>
+              {% endif %}
 
-            <a href="{{ query.toggle_param(facet.field, bucket.key) }}">
-              {{bucket.label}}
-            </a>
-          </td>
-          <td class="numeric">
-            {{bucket.count | intcomma}}
-          </td>
-        </tr>
-      {% endfor %}
+              <a href="{{ query.toggle_param(facet.field, bucket.key) }}">
+                {{bucket.label}}
+              </a>
+            </td>
+            <td class="numeric">
+              {{bucket.count | intcomma}}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
   {% endif %}
 {% endmacro %}

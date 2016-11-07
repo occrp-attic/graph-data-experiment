@@ -60,10 +60,11 @@ class LinkResult(ResultDocument):
 
 class FacetBucket(object):
 
-    def __init__(self, facet, bucket):
+    def __init__(self, facet, bucket, active):
         self.facet = facet
         self.key = bucket.get('key')
         self.count = bucket.get('doc_count')
+        self.active = active
 
     @property
     def label(self):
@@ -76,8 +77,42 @@ class FacetBucket(object):
         if self.facet.icon_func is not None:
             return self.facet.icon_func(self.key)
 
-    def __len__(self):
-        return self.count
+    def __cmp__(self, other):
+        val = cmp(self.active, other.active)
+        if val == 0:
+            val = cmp(self.count, other.count)
+        return val
+
+
+class FacetResult(object):
+
+    def __init__(self, result, facet):
+        self.result = result
+        self.facet = facet
+        self.field = facet.field
+        self.active = result.query.getlist(facet.field)
+        aggregation = result.aggregations.get(facet.field, {})
+        self._buckets = aggregation.get('buckets')
+
+    @property
+    def show(self):
+        return len(self.active) or len(self._buckets)
+
+    @property
+    def buckets(self):
+        seen = set()
+        buckets = []
+        for bucket in self._buckets:
+            key = bucket.get('key')
+            active = key in self.active
+            seen.add(key)
+            buckets.append(FacetBucket(self.facet, bucket, active))
+        for active in self.active:
+            if active in seen:
+                continue
+            bucket = {'key': active, 'doc_count': 0}
+            buckets.append(FacetBucket(self.facet, bucket, True))
+        return sorted(buckets, reverse=True)
 
 
 class ResultSet(object):
@@ -141,13 +176,7 @@ class ResultSet(object):
 
     @property
     def facets(self):
-        for facet in self.query.facets:
-            data = self.aggregations.get(facet.field, {})
-            # This is a bit ugly, nailing the buckets onto the facet externally
-            facet.buckets = []
-            for bucket in data.get('buckets', []):
-                facet.buckets.append(FacetBucket(facet, bucket))
-            yield facet
+        return [FacetResult(self, f) for f in self.query.facets]
 
     def __iter__(self):
         for document in self.hits.get('hits', []):
