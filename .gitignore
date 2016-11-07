@@ -2,6 +2,7 @@
 *.pyc
 .DS_Store
 *.egg-info
+celerybeat-schedule.db
 
 memorious/static/.webassets-cache/*
 memorious/static/assets/*
