@@ -43,6 +43,13 @@ footer {
         font-size: 1.8em;
         font-weight: 900;
         margin-top: 0em;
+
+        a {
+            color: $grey-dark;
+            &:hover {
+                text-decoration: none;
+            }
+        }
     }
 }
 

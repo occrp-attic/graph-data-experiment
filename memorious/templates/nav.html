@@ -1,7 +1,9 @@
 
 <div class="row main-nav">
   <div class="col-md-3">
-    <h1>{{config.APP_TITLE}}</h1>
+    <h1>
+      <a href="{{url_for('base.index')}}">{{config.APP_TITLE}}</a>
+    </h1>
   </div>
   <div class="col-md-9">
     <form action="{{url_for('base.search')}}">

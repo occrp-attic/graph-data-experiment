@@ -16,6 +16,25 @@
 {% endmacro %}
 
 
+{% macro render_value(value, prop) %}
+  {% if prop.type.name == 'address' %}
+    {{value}}
+    <a href="https://www.google.com/maps?q={{value | urlencode}}"><i class="fa fa-map-marker"></i></a>
+  {% elif prop.type.name == 'url' %}
+    <a href="{{value}}">{{value}}</a>
+  {% else %}
+    {{value}}
+  {% endif %}
+{% endmacro %}
+
+
+{% macro render_values(values, prop) %}
+  {% for value in values %}
+    {{render_value(value, prop)}}{% if not loop.last %}, {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+
 {% macro pager(results) %}
   {% if results.pages > 1 %}
     <ul class="pagination">

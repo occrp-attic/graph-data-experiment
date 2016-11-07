@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ entity.name }}{% endblock %}
+{% block title %}
+  {{ entity.name }}
+  - {{ entity.schema.label }}
+{% endblock %}
 
 {% block content %} 
   <div class="row header">
@@ -26,9 +29,7 @@
             <tr>
               <th width="30%">{{prop.label}}</th>
               <td>
-                {% for value in values %}
-                  {{value}}{% if not loop.last %}, {% endif %}
-                {% endfor %}
+                {{macros.render_values(values, prop)}}
               </td>
             </tr>
           {% endfor %}
@@ -85,7 +86,7 @@
           </tr>
           {% for link in links %}
             <tr>
-              <td width="15%">
+              <td>
                 {{link.label}}
               </td>
               <td>
@@ -94,13 +95,13 @@
                 </a>
               </td>
               <td>
-                {{link.properties.startDate | first }}
+                {{ macros.render_values(link.properties.startDate, link.schema.get('startDate')) }}
               </td>
               <td>
-                {{link.properties.endDate | first }}
+                {{ macros.render_values(link.properties.endDate, link.schema.get('endDate')) }}
               </td>
               <td>
-                {{link.properties.summary | first }}
+                {{ macros.render_values(link.properties.summary, link.schema.get('summary')) }}
               </td>
             </tr>
           {% endfor %}

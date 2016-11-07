@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ query.text }}{% endblock %}
+{% block title %}
+  {% if query.text %}
+    {{ query.text }}
+  {% else %}
+    Search
+  {% endif %}
+  ({{results.total | intcomma}} results)
+{% endblock %}
 
 {% block content %}
   <div class="row">
@@ -21,6 +28,9 @@
                 <a href="{{url_for('base.entity', entity_id=result.id)}}">
                   {{result.name}}
                 </a>
+              </td>
+              <td width="20%">
+                {{result.dataset.label}}
               </td>
               <td>
                 {% for country in result.data.countries %}
