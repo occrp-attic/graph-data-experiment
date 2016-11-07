@@ -48,7 +48,42 @@
     </div>
   </div>
 
-  {% if links.visible %}
+  {% if duplicates.show_results %}
+    {{ macros.subheader("Possible duplicates") }}
+    <div class="row">
+      <div class="col-md-3">
+        {% if duplicates.show_filters %}
+          {% for facet in duplicates.facets %}
+            {{ macros.facet(duplicates.query, facet) }}
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="col-md-9">
+        <table class="table table-condensed">
+          <tr>
+            <th>Entity</th>
+            <th>Dataset</th>
+          </tr>
+          {% for duplicate in duplicates %}
+            <tr>
+              <td>
+                {{ macros.entity_icon(duplicate.schema) }}
+                <a href="{{url_for('base.entity', entity_id=duplicate.id)}}">
+                  {{duplicate.name}}
+                </a>
+              </td>
+              <td>
+                {{ duplicate.dataset.label }}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        {{ macros.pager(duplicates) }}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if links.show_results %}
     {{ macros.subheader("Relationships") }}
     <div class="row">
       <div class="col-md-3">
@@ -90,6 +125,7 @@
                 {{link.label}}
               </td>
               <td>
+                {{ macros.entity_icon(link.remote_schema) }}
                 <a href="{{url_for('base.entity', entity_id=link.remote.id)}}">
                   {{link.remote.name}}
                 </a>
@@ -110,4 +146,39 @@
       </div>
     </div>
   {% endif %}
+
+  {{ macros.subheader("Debug information") }}
+  <div class="row">
+    <div class="col-md-offset-3 col-md-9">
+      <table class="table table-condensed">
+        <tr>
+          <th width="30%">Fingerprints:</th>
+          <td>
+            {% for fp in entity.fingerprints %}
+              <code>{{fp}}</code>
+            {% endfor %}
+          </td>
+        </tr>
+        <tr>
+          <th>Inferred FP:</th>
+          <td>
+            {% for fp in fingerprints %}
+              <code>{{fp}}</code>
+            {% endfor %}
+          </td>
+        </tr>
+        {% if entity.data.countries %}
+          <tr>
+            <th>Countries:</th>
+            <td>
+              {% for country in entity.data.countries %}
+                <code>{{country}}</code>
+              {% endfor %}
+            </td>
+          </tr>
+        {% endif %}
+      </table>
+    </div>
+    </div>
+  </div>
 {% endblock %}

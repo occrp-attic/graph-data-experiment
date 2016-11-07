@@ -35,7 +35,7 @@ def load_records(dataset_name, query_idx, records):
 
     index_items(items)
     log.info("[%r] Indexed %s records as %s documents...",
-             dataset, len(records), len(items))
+             dataset_name, len(records), len(items))
 
 
 def load_dataset(dataset):

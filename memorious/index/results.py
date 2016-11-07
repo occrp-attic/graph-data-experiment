@@ -12,7 +12,7 @@ class ResultDocument(object):
     def __init__(self, document, parent=None):
         self.parent = parent
         self.document = document
-        self.data = document.get('_source')
+        self.data = document.get('_source', document)
         self.id = document.get('_id')
         self.properties = self.data.get('properties')
         self.schema = model.get_schema(document.get('_type'),
@@ -40,6 +40,7 @@ class EntityResult(ResultDocument):
     def __init__(self, document, parent=None):
         super(EntityResult, self).__init__(document, parent=parent)
         self.name = self.data.get('name')
+        self.fingerprints = self.data.get('fingerprints')
 
 
 class LinkResult(ResultDocument):
@@ -53,6 +54,8 @@ class LinkResult(ResultDocument):
             self.label = self.schema.reverse
         else:
             self.label = self.schema.forward
+        rschema = self.remote.get('schema')
+        self.remote_schema = model.get_schema(Schema.ENTITY, rschema)
 
 
 class FacetBucket(object):
@@ -86,6 +89,14 @@ class ResultSet(object):
         self.hits = results.get('hits', {})
         self.aggregations = results.get('aggregations', {})
         self.total = self.hits.get('total', 0)
+
+    @property
+    def show_results(self):
+        return self.query.has_query or self.total > 0
+
+    @property
+    def show_filters(self):
+        return self.query.has_query or self.total > self.query.limit
 
     @property
     def pages(self):

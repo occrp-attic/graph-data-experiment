@@ -5,7 +5,8 @@ from memorious.model import Schema
 from memorious.index.results import ResultSet, EntityResult
 
 FACET_SIZE = 500
-LINK_FILTERS = ['schemata']
+LINK_FILTERS = ['schemata', 'remote.countries']
+ENTITY_FILTERS = ['schemata', 'dataset', 'countries', 'phones', 'addresses']
 
 
 def search_entities(query, auth):
@@ -20,11 +21,27 @@ def search_entities(query, auth):
         }
     else:
         q = {'match_all': {}}
-    q = compose_query(q, query, auth, ['schemata', 'dataset', 'countries',
-                                       'phones', 'addresses'])
+    q = compose_query(q, query, auth, ENTITY_FILTERS)
 
     # import json
     # print json.dumps(q)
+    result = es.search(index=es_index, doc_type=Schema.ENTITY, body=q)
+    return ResultSet(query, result)
+
+
+def search_duplicates(entity_id, fingerprints, query, auth):
+    """Find all the entities with the same fingerprints."""
+    q = {
+        'bool': {
+            'must': [
+                {'terms': {'fingerprints': list(fingerprints)}}
+            ],
+            'must_not': [
+                {'terms': {'_id': [entity_id]}}
+            ]
+        }
+    }
+    q = compose_query(q, query, auth, ENTITY_FILTERS)
     result = es.search(index=es_index, doc_type=Schema.ENTITY, body=q)
     return ResultSet(query, result)
 
@@ -47,7 +64,7 @@ def search_links(entity, query, auth):
             }
         }
 
-    q = compose_query(q, query, auth, ['schemata', 'remote.countries'])
+    q = compose_query(q, query, auth, LINK_FILTERS)
     result = es.search(index=es_index, doc_type=Schema.LINK, body=q)
     return ResultSet(query, result, parent=entity)
 
