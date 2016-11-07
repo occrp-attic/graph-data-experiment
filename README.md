@@ -5,12 +5,15 @@ emporium - table metadata layer
 
 ### TODO
 
-* [done] URL, Date and Identifier types
-* Entity overlap collector
-* Fingerprint/dataset index type
+* Link details page
 * Facet length expander
-* Type rendering
-* FA Icons
+* Crossreferencing UI
+* Index transliteration
+* [done] URL, Date and Identifier types
+* [done] Entity overlap collector
+* [done] Fingerprint/dataset index type
+* [done] Type rendering
+* [done] FA Icons
 * [done] Script command
 * [done] Figure out multi-view code
 * [done] Entity profile page
