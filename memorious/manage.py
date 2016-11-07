@@ -34,7 +34,6 @@ def load(name):
 
 @manager.command
 def delete(name):
-    # dataset = model.get_dataset(name)
     delete_dataset(name)
 
 

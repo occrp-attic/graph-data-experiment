@@ -6,6 +6,7 @@ from flask_assets import Environment
 from flask_oauthlib.client import OAuth
 from werkzeug.local import LocalProxy
 from sqlalchemy import create_engine, MetaData
+from celery import Celery
 from elasticsearch import Elasticsearch
 
 from memorious import default_settings
@@ -17,6 +18,7 @@ mail = Mail()
 assets = Environment()
 oauth = OAuth()
 oauth_provider = oauth.remote_app('provider', app_key='OAUTH')
+celery = Celery('memorious')
 
 
 def create_app(config={}):
@@ -27,6 +29,7 @@ def create_app(config={}):
     mail.init_app(app)
     assets.init_app(app)
     oauth.init_app(app)
+    celery.conf.update(app.config)
     return app
 
 
