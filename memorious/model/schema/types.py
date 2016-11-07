@@ -13,28 +13,28 @@ from memorious.util import clean_text
 class StringProperty(object):
     index_invert = None
 
-    def __init__(self, prop):
-        self.prop = prop
+    def __init__(self):
+        self.name = type(self).__name__.lower().replace('property', '')
 
     def clean(self, value, record):
         return clean_text(value)
 
-    def normalize(self, values, record):
+    def normalize(self, values, prop, record):
         results = []
         for value in values:
-            for value in self.normalize_value(value, record):
+            for value in self.normalize_value(value, prop, record):
                 if value is not None:
                     results.append(value)
         return set(results)
 
-    def normalize_value(self, value, record):
+    def normalize_value(self, value, prop, record):
         return [self.clean(value, record)]
 
 
 class NameProperty(StringProperty):
     index_invert = 'fingerprints'
 
-    def normalize_value(self, value, record):
+    def normalize_value(self, value, prop, record):
         return [fingerprints.generate(value)]
 
 
@@ -45,8 +45,8 @@ class URLProperty(StringProperty):
 class DateProperty(StringProperty):
     index_invert = 'dates'
 
-    def normalize_value(self, value, record):
-        date_format = self.prop.data.get('format')
+    def normalize_value(self, value, prop, record):
+        date_format = prop.data.get('format')
         if date_format is not None:
             try:
                 date = datetime.strptime(value, date_format)
@@ -63,34 +63,25 @@ class DateProperty(StringProperty):
 class CountryProperty(StringProperty):
     index_invert = 'countries'
 
-    def normalize_value(self, value, record):
+    def normalize_value(self, value, prop, record):
         return [countrynames.to_code(value)]
 
 
 class AddressProperty(StringProperty):
     index_invert = 'addresses'
 
-    def normalize_value(self, value, record):
-        return [value]
+    def normalize_value(self, value, prop, record):
+        return [fingerprints.generate(value)]
 
 
 class PhoneProperty(StringProperty):
     index_invert = 'phones'
     FORMAT = phonenumbers.PhoneNumberFormat.E164
 
-    def get_countries(self, record):
-        """Find the country references on this record."""
-        countries = [self.prop.data.get('country')]
+    def normalize(self, values, prop, record):
+        countries = [prop.data.get('country')]
         if countries[0] is None:
-            for prop in self.prop.mapper.properties:
-                if isinstance(prop.type, CountryProperty):
-                    countries.extend(prop.type.normalize(None, record))
-        return countries
-
-    def normalize(self, values, record):
-        countries = [self.prop.data.get('country')]
-        if countries[0] is None:
-            for prop in self.prop.mapper.properties:
+            for prop in prop.mapper.properties:
                 if isinstance(prop.type, CountryProperty):
                     pvalues = prop.get_values(record)
                     countries.extend(prop.type.normalize(pvalues, record))
@@ -111,7 +102,7 @@ class PhoneProperty(StringProperty):
 class EmailProperty(StringProperty):
     index_invert = 'emails'
 
-    def normalize_value(self, value, record):
+    def normalize_value(self, value, prop, record):
         parsed = address.parse(value)
         if parsed is not None:
             return [parsed.address]
@@ -121,10 +112,10 @@ class IdentiferProperty(StringProperty):
     index_invert = 'fingerprints'
     clean_re = re.compile('[^a-zA-Z0-9]*')
 
-    def normalize_value(self, value, record):
-        scheme = self.prop.data.get('scheme')
+    def normalize_value(self, value, prop, record):
+        scheme = prop.data.get('scheme')
         if scheme is None:
-            raise TypeError("No scheme given for: %s", self.prop)
+            raise TypeError("No scheme given for: %s", prop)
         value = self.clean_re.sub('', value).upper()
         if not len(value):
             return []

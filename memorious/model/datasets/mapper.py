@@ -13,7 +13,6 @@ class MapperProperty(object):
         self.name = name
         self.data = data
         self.schema = schema
-        self.type = schema.type_cls(self)
         self.refs = dict_list(data, 'column', 'columns')
         self.literals = dict_list(data, 'literal', 'literals')
         self.join = data.get('join')
@@ -32,7 +31,7 @@ class MapperProperty(object):
             for r in self.refs:
                 values.append(record.get(r))
         values.extend(self.literals)
-        values = [self.type.clean(v, record) for v in values]
+        values = [self.schema.type.clean(v, record) for v in values]
         values = [v for v in values if v is not None]
 
         if self.join is not None:
@@ -126,13 +125,13 @@ class EntityMapper(Mapper):
 
             # Add inverted properties. This takes all the properties
             # of a specific type (names, dates, emails etc.)
-            invert = prop.type.index_invert
-            if invert:
-                if invert not in data:
-                    data[invert] = []
-                for norm in prop.type.normalize(values, record):
-                    if norm not in data[invert]:
-                        data[invert].append(norm)
+            type_ = prop.schema.type
+            if type_.invert:
+                if type_.invert not in data:
+                    data[type_.invert] = []
+                for norm in type_.normalize(values, prop, record):
+                    if norm not in data[type_.invert]:
+                        data[type_.invert].append(norm)
 
         return data
 

@@ -11,7 +11,8 @@ class SchemaProperty(object):
         self.label = data.get('label', name)
         self.is_hidden = data.get('hidden', False)
         self.is_label = name == 'name'
-        self.type_cls = resolve_type(data.get('type', 'string'))
+        cls = resolve_type(data.get('type', 'string'))
+        self.type = cls()
 
     def __repr__(self):
         return '<SchemaProperty(%r, %r)>' % (self.schema, self.name)
