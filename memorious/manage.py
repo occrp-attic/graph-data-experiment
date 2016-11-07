@@ -12,13 +12,6 @@ mount_app_blueprints(app)
 manager = Manager(app)
 
 
-def sub_opts(app, **kwargs):
-    pass
-
-dataset_manager = Manager(sub_opts, help="Dataset-related operations",
-                          description="Operations which relate to a dataset")
-
-
 @manager.command
 def init():
     """Re-initialise the search index."""
@@ -32,21 +25,20 @@ def index():
         index_dataset(dataset)
 
 
-@dataset_manager.command
+@manager.command
 def load(name):
     """Index all the entities in a given dataset."""
     dataset = model.get_dataset(name)
     index_dataset(dataset)
 
 
-@dataset_manager.command
+@manager.command
 def delete(name):
-    dataset = model.get_dataset(name)
-    delete_dataset(dataset)
+    # dataset = model.get_dataset(name)
+    delete_dataset(name)
 
 
 def main():
-    manager.add_command("dataset", dataset_manager)
     manager.run()
 
 

@@ -89,9 +89,9 @@ def index_dataset(dataset):
     optimize_search()
 
 
-def delete_dataset(dataset):
+def delete_dataset(dataset_name):
     """Delete all entries from a particular dataset."""
-    q = {'query': {'term': {'dataset': dataset.name}}, '_source': False}
+    q = {'query': {'term': {'dataset': dataset_name}}, '_source': False}
 
     def deletes():
         for i, res in enumerate(scan(es, query=q, index=es_index)):
@@ -102,7 +102,7 @@ def delete_dataset(dataset):
                 '_id': res.get('_id')
             }
             if i > 0 and i % 10000 == 0:
-                log.info("Delete %s: %s", dataset, i)
+                log.info("Delete %s: %s", dataset_name, i)
     es.indices.refresh(index=es_index)
     bulk(es, deletes(), stats_only=True, chunk_size=DATA_PAGE)
     optimize_search()
