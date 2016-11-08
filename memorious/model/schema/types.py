@@ -47,6 +47,8 @@ class DateProperty(StringProperty):
 
     def clean(self, value, prop, record):
         value = super(DateProperty, self).clean(value, prop, record)
+        if value is None:
+            return value
         date_format = prop.data.get('format')
         if date_format is not None:
             try:
