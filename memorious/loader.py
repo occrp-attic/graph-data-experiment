@@ -1,4 +1,5 @@
 import logging
+from elasticsearch import ElasticsearchException
 
 from memorious.core import celery, model
 from memorious.index import index_items
@@ -24,8 +25,8 @@ def map_record(query, record):
                 yield (Schema.LINK, data['id'], data)
 
 
-@celery.task()
-def load_records(dataset_name, query_idx, records):
+@celery.task(bind=True)
+def load_records(task, dataset_name, query_idx, records):
     """Load a single batch of QUEUE_PAGE records from the given query."""
     dataset = model.get_dataset(dataset_name)
     items = []
@@ -33,7 +34,11 @@ def load_records(dataset_name, query_idx, records):
         for item in map_record(dataset.queries[query_idx], record):
             items.append(item)
 
-    index_items(items)
+    try:
+        index_items(items)
+    except ElasticsearchException as exc:
+        raise task.retry(exc=exc, countdown=60, max_retries=5)
+
     log.info("[%r] Indexed %s records as %s documents...",
              dataset_name, len(records), len(items))
 

@@ -6,7 +6,8 @@ from memorious.index.results import ResultSet, EntityResult
 
 FACET_SIZE = 500
 LINK_FILTERS = ['schemata', 'remote.countries']
-ENTITY_FILTERS = ['schemata', 'dataset', 'countries', 'phones', 'addresses']
+ENTITY_FILTERS = ['schemata', 'dataset', 'countries', 'phones',
+                  'addresses', 'dates']
 
 
 def search_entities(query, auth):
