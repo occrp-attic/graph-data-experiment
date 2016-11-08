@@ -40,7 +40,7 @@ class EntityResult(ResultDocument):
     def __init__(self, document, parent=None):
         super(EntityResult, self).__init__(document, parent=parent)
         self.name = self.data.get('name')
-        self.fingerprints = self.data.get('fingerprints')
+        self.fingerprints = self.data.get('fingerprints', [])
 
 
 class LinkResult(ResultDocument):

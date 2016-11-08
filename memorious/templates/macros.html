@@ -60,6 +60,34 @@
 
 {% macro facet(query, facet) %}
   {% if facet.show %}
+    <div class="facet">
+      <div class="facet-header">
+        {{facet.facet.label}}
+      </div>
+      <div class="facet-body">
+        {% for bucket in facet.buckets %}
+        <div class="facet-value {% if bucket.active %}active{% endif %}">
+          <div class="count">
+            {{bucket.count | intcomma}}
+          </div>
+
+          {% if bucket.icon %}
+            <i class="fa fa-fw {{bucket.icon}}"></i>
+          {% endif %}
+
+          <a href="{{ query.toggle_param(facet.field, bucket.key) }}">
+            {{bucket.label}}
+          </a>    
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro table_facet(query, facet) %}
+  {% if facet.show %}
     <table class="table table-condensed table-facets">
       <tr>
         <th colspan="2" class="facet-header">
@@ -68,7 +96,7 @@
       </tr>
       <tbody>
         {% for bucket in facet.buckets %}
-          <tr class="{% if bucket.active %}active{% endif %}">
+          <tr class="label {% if bucket.active %}active{% endif %}">
             <td>
               {% if bucket.icon %}
                 <i class="fa fa-fw {{bucket.icon}}"></i>

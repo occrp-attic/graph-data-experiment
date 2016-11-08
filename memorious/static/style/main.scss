@@ -53,23 +53,64 @@ footer {
     }
 }
 
+
 /* Search facets. */
-.table-facets {
-    .facet-header {
-        border-top: 0;
+$table-condensed-cell-padding:  5px !default;
+$table-bg-hover:                #f5f5f5 !default;
+$table-bg-active:               $table-bg-hover !default;
+$table-border-color:            #ddd !default;
+
+.facet {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 1px;
+    margin-bottom: 32px;
+
+    .facet-header, .facet-value {
+        padding: $table-condensed-cell-padding;
+        border-bottom: 1px solid $table-border-color;
+        vertical-align: top;
     }
-    
-    .active {
+
+    .facet-header {
         font-weight: bold;
     }
 
-    tbody {
-        // max-height: 25vh;
-        // width: inherit;
-        // overflow-y: scroll;
-        // overflow: -moz-scrollbars-vertical;
+    .facet-body {
+        max-height: 30vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    .facet-value {
+        &.active {
+            background-color: $table-bg-active;
+            font-weight: bold;
+        }
+
+        .count {
+            float: right;
+        }
     }
 }
+
+// .table-facets {
+
+//     .facet-header {
+//         border-top: 0;
+//     }
+    
+//     .active {
+//         font-weight: bold;
+//     }
+
+//     tbody {
+//         // max-height: 25vh;
+//         // width: inherit;
+//         // overflow-y: scroll;
+//         // overflow: -moz-scrollbars-vertical;
+//     }
+// }
 
 /* Page layout re-usable bits. */
 .subheader, .header {
