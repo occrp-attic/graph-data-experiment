@@ -10,7 +10,7 @@
 
 
 {% macro entity_icon(schema) %}
-  <span data-toggle="tooltip" data-placement="bottom" title="{{schema.label}}">
+  <span data-toggle="tooltip" data-placement="top" title="{{schema.label}}">
     <i class="fa fa-fw {{schema.icon}}"></i>
   </span>
 {% endmacro %}
@@ -18,7 +18,8 @@
 
 {% macro value_search(field, value) %}
   {% set query = field + ':"' + value + '"' %}
-  <a href="{{url_for('base.search', q=query)}}">
+  <a href="{{url_for('base.search', q=query)}}" data-toggle="tooltip"
+     data-placement="top" title="Search similar entities">
     <i class="fa fa-fw fa-search" aria-hidden="true"></i>
   </a>
 {% endmacro %}
@@ -30,7 +31,9 @@
       {% if searches %}
         {% set addr = value | normalizeaddress %}
         {{value_search('addresses', addr)}}
-        <a href="https://www.google.com/maps?q={{value | urlencode}}">
+        <a href="https://www.google.com/maps?q={{value | urlencode}}"
+           data-toggle="tooltip" data-placement="top"
+           title="View in Google Maps">
           <i class="fa fa-fw fa-map-marker"></i>
         </a>
       {% endif %}

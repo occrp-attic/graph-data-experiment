@@ -19,3 +19,4 @@ pycountry
 humanize
 dateparser
 celery==4.0.0
+pyicu
