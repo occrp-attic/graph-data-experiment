@@ -46,6 +46,7 @@ class DateProperty(StringProperty):
     index_invert = 'dates'
 
     def clean(self, value, prop, record):
+        value = super(DateProperty, self).clean(value, prop, record)
         date_format = prop.data.get('format')
         if date_format is not None:
             try:
@@ -71,6 +72,7 @@ class CountryProperty(StringProperty):
     index_invert = 'countries'
 
     def clean(self, value, prop, record):
+        value = super(CountryProperty, self).clean(value, prop, record)
         return countrynames.to_code(value) or value
 
 
@@ -110,6 +112,9 @@ class EmailProperty(StringProperty):
     index_invert = 'emails'
 
     def clean(self, value, prop, record):
+        value = super(EmailProperty, self).clean(value, prop, record)
+        if value is None:
+            return
         parsed = address.parse(value)
         if parsed is not None:
             return parsed.address
