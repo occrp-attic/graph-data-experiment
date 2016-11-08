@@ -6,9 +6,10 @@ emporium - table metadata layer
 ### TODO
 
 * Link details page
-* Facet length expander
 * Crossreferencing UI
 * Index transliteration
+* Country cleaning
+* [done] Facet length expander
 * [done] URL, Date and Identifier types
 * [done] Entity overlap collector
 * [done] Fingerprint/dataset index type

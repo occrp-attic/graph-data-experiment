@@ -9,6 +9,7 @@ from memorious.util import chunk_iter
 
 log = logging.getLogger(__name__)
 CHUNK_SIZE = 5000
+
 CROSSREF_TYPE = 'crossref'
 
 
