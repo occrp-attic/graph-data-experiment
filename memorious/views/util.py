@@ -1,6 +1,7 @@
 from flask import request
 from datetime import datetime
 from urlparse import urlparse, urljoin
+import fingerprints
 
 from memorious.core import model
 from memorious.model import Schema
@@ -48,6 +49,23 @@ def date(value):
         return dt.strftime('%d.%m.%Y')
     except ValueError:
         return value
+
+
+def cleanurl(value, maxlen=25):
+    if value is None:
+        return ''
+    try:
+        parsed = urlparse(value)
+        host = parsed.hostname.lower()
+        if host.startswith('www.'):
+            host = host[len('www.'):]
+        return host
+    except:
+        return value
+
+
+def normalizeaddress(value):
+    return fingerprints.generate(value)
 
 
 def is_safe_url(target):

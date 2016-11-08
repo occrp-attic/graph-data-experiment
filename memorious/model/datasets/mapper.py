@@ -172,6 +172,7 @@ class LinkMapper(Mapper):
             'id': origin.get('id'),
             'fingerprints': origin.get('fingerprints'),
         }
+        data['text'].extend(remote.pop('text'))
         data['remote'] = remote
 
         # Generate a link ID

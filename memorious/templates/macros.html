@@ -16,25 +16,44 @@
 {% endmacro %}
 
 
-{% macro render_value(value, prop) %}
-  {% if prop.type.name == 'address' %}
-    {{value}}
-    <a href="https://www.google.com/maps?q={{value | urlencode}}"><i class="fa fa-map-marker"></i></a>
-  {% elif prop.type.name == 'url' %}
-    <a href="{{value}}">{{value}}</a>
-  {% elif prop.type.name == 'country' %}
-    {{value | country}}
-  {% elif prop.type.name == 'date' %}
-    {{value | date}}
-  {% else %}
-    {{value}}
-  {% endif %}
+{% macro value_search(field, value) %}
+  {% set query = field + ':"' + value + '"' %}
+  <a href="{{url_for('base.search', q=query)}}">
+    <i class="fa fa-fw fa-search" aria-hidden="true"></i>
+  </a>
+{% endmacro %}
+
+{% macro render_value(value, prop, searches=False) %}
+  <span class="value-render">
+    {% if prop.type.name == 'address' %}
+      {{value}}
+      {% if searches %}
+        {% set addr = value | normalizeaddress %}
+        {{value_search('addresses', addr)}}
+        <a href="https://www.google.com/maps?q={{value | urlencode}}">
+          <i class="fa fa-fw fa-map-marker"></i>
+        </a>
+      {% endif %}
+    {% elif prop.type.name == 'url' %}
+      <a href="{{value}}">{{value | cleanurl}}</a>
+    {% elif prop.type.name == 'country' %}
+      {{value | country}}
+    {% elif prop.type.name == 'date' %}
+      {{value | date}}
+      {% if searches %}
+        {{value_search('dates', value)}}
+      {% endif %}
+    {% else %}
+      {{value}}
+    {% endif %}
+  </span>
 {% endmacro %}
 
 
-{% macro render_values(values, prop) %}
+{% macro render_values(values, prop, searches=False) %}
   {% for value in values %}
-    {{render_value(value, prop)}}{% if not loop.last %}, {% endif %}
+    {{render_value(value, prop, searches=searches)}}
+    {% if not loop.last %} &middot; {% endif %}
   {% endfor %}
 {% endmacro %}
 

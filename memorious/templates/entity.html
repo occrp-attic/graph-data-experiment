@@ -29,7 +29,7 @@
             <tr>
               <th width="30%">{{prop.label}}</th>
               <td>
-                {{macros.render_values(values, prop)}}
+                {{macros.render_values(values, prop, searches=True)}}
               </td>
             </tr>
           {% endfor %}

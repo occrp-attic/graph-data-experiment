@@ -94,23 +94,13 @@ $table-border-color:            #ddd !default;
     }
 }
 
-// .table-facets {
-
-//     .facet-header {
-//         border-top: 0;
-//     }
-    
-//     .active {
-//         font-weight: bold;
-//     }
-
-//     tbody {
-//         // max-height: 25vh;
-//         // width: inherit;
-//         // overflow-y: scroll;
-//         // overflow: -moz-scrollbars-vertical;
-//     }
-// }
+.value-render {
+    a {
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
 
 /* Page layout re-usable bits. */
 .subheader, .header {

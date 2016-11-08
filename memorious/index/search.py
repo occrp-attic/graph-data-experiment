@@ -2,6 +2,7 @@ from pprint import pprint  # noqa
 
 from memorious.core import es, es_index
 from memorious.model import Schema
+from memorious.util import latinize_text
 from memorious.index.results import ResultSet, EntityResult
 
 FACET_SIZE = 500
@@ -12,14 +13,8 @@ ENTITY_FILTERS = ['schemata', 'dataset', 'countries', 'phones',
 
 def search_entities(query, auth):
     if query.has_text:
-        q = {
-            'query_string': {
-                'query': query.text,
-                'fields': ['name^6', 'fingerprints^2', 'text', '_all'],
-                'default_operator': 'AND',
-                'use_dis_max': True
-            }
-        }
+        q = search_text(query.text,
+                        ['name^6', 'fingerprints^2', 'text', '_all'])
     else:
         q = {'match_all': {}}
     q = compose_query(q, query, auth, ENTITY_FILTERS)
@@ -50,18 +45,10 @@ def search_duplicates(entity_id, fingerprints, query, auth):
 def search_links(entity, query, auth):
     q = {'term': {'origin.id': entity.id}}
     if query.has_text:
-        textq = {
-            'query_string': {
-                'query': query.text,
-                'fields': ['remote.name^6', 'remote.fingerprints^2',
-                           'text', '_all'],
-                'default_operator': 'AND',
-                'use_dis_max': True
-            }
-        }
+        fields = ['remote.name^6', 'remote.fingerprints^2', 'text', '_all']
         q = {
             'bool': {
-                'must': [q, textq]
+                'must': [q, search_text(query.text, fields)]
             }
         }
 
@@ -88,6 +75,32 @@ def load_entity(entity_id, auth):
         return None
     for document in hits.get('hits', []):
         return EntityResult(document)
+
+
+def search_text(text, fields):
+    q = {
+        'query_string': {
+            'query': text,
+            'fields': fields,
+            'default_operator': 'AND'
+        }
+    }
+    latin_text = latinize_text(text)
+    if latin_text != text:
+        latin_q = {
+            'query_string': {
+                'query': latin_text,
+                'fields': fields,
+                'default_operator': 'AND'
+            }
+        }
+        q = {
+            'bool': {
+                'should': [q, latin_q],
+                'minimum_should_match': 1
+            }
+        }
+    return q
 
 
 def compose_query(q, query, auth, filters):
