@@ -16,7 +16,7 @@ class StringProperty(object):
     def __init__(self):
         self.name = type(self).__name__.lower().replace('property', '')
 
-    def clean(self, value, record):
+    def clean(self, value, prop, record):
         return clean_text(value)
 
     def normalize(self, values, prop, record):
@@ -28,7 +28,7 @@ class StringProperty(object):
         return set(results)
 
     def normalize_value(self, value, prop, record):
-        return [self.clean(value, record)]
+        return [self.clean(value, prop, record)]
 
 
 class NameProperty(StringProperty):
@@ -45,26 +45,33 @@ class URLProperty(StringProperty):
 class DateProperty(StringProperty):
     index_invert = 'dates'
 
-    def normalize_value(self, value, prop, record):
+    def clean(self, value, prop, record):
         date_format = prop.data.get('format')
         if date_format is not None:
             try:
                 date = datetime.strptime(value, date_format)
-                return [date.date().isoformat()]
+                return date.date().isoformat()
             except:
-                return []
+                return value
         else:
             date = dateparser.parse(value)
             if date is not None:
-                return [date.date().isoformat()]
-        return []
+                return date.date().isoformat()
+        return value
+
+    def normalize_value(self, value, prop, record):
+        try:
+            datetime.strptime(value, '%Y-%m-%d')
+            return [value]
+        except ValueError:
+            return []
 
 
 class CountryProperty(StringProperty):
     index_invert = 'countries'
 
-    def normalize_value(self, value, prop, record):
-        return [countrynames.to_code(value)]
+    def clean(self, value, prop, record):
+        return countrynames.to_code(value) or value
 
 
 class AddressProperty(StringProperty):
@@ -101,6 +108,12 @@ class PhoneProperty(StringProperty):
 
 class EmailProperty(StringProperty):
     index_invert = 'emails'
+
+    def clean(self, value, prop, record):
+        parsed = address.parse(value)
+        if parsed is not None:
+            return parsed.address
+        return value
 
     def normalize_value(self, value, prop, record):
         parsed = address.parse(value)

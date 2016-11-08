@@ -22,6 +22,10 @@
     <a href="https://www.google.com/maps?q={{value | urlencode}}"><i class="fa fa-map-marker"></i></a>
   {% elif prop.type.name == 'url' %}
     <a href="{{value}}">{{value}}</a>
+  {% elif prop.type.name == 'country' %}
+    {{value | country}}
+  {% elif prop.type.name == 'date' %}
+    {{value | date}}
   {% else %}
     {{value}}
   {% endif %}

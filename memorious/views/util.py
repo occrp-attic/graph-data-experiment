@@ -1,18 +1,10 @@
 from flask import request
+from datetime import datetime
 from urlparse import urlparse, urljoin
-from pycountry import countries
 
 from memorious.core import model
 from memorious.model import Schema
-
-COUNTRY_NAMES = {
-    'ZZ': 'Global',
-    'EU': 'European Union',
-    'XK': 'Kosovo'
-}
-
-for country in countries:
-    COUNTRY_NAMES[country.alpha2] = country.name
+from memorious.reference import COUNTRY_NAMES
 
 
 def dataset_label(key):
@@ -46,8 +38,16 @@ def link_schema_label(key):
         return key
 
 
-def country_label(key):
+def country(key):
     return COUNTRY_NAMES.get(key, key)
+
+
+def date(value):
+    try:
+        dt = datetime.strptime(value, '%Y-%m-%d')
+        return dt.strftime('%d.%m.%Y')
+    except ValueError:
+        return value
 
 
 def is_safe_url(target):
