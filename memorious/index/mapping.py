@@ -78,3 +78,14 @@ LINK_MAPPING = {
         }
     }
 }
+
+
+CROSSREF_MAPPING = {
+    "_all": {
+        "enabled": False
+    },
+    "properties": {
+        "fingerprint": {"type": "string", "index": "analyzed"},
+        "datasets": {"type": "string", "index": "not_analyzed"}
+    }
+}
