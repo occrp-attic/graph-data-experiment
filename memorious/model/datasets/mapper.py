@@ -5,6 +5,7 @@ from pprint import pprint  # noqa
 from memorious.model.schema import Schema
 from memorious.model.datasets.formatting import Formatter
 from memorious.util import dict_list, unique_list, clean_text
+from memorious.util import latinize_text
 
 
 class MapperProperty(object):
@@ -32,7 +33,7 @@ class MapperProperty(object):
             for r in self.refs:
                 values.append(record.get(r))
         values.extend(self.literals)
-        values = [self.schema.type.clean(v, record) for v in values]
+        values = [self.schema.type.clean(v, self, record) for v in values]
         values = [v for v in values if v is not None]
 
         if self.join is not None:
@@ -85,23 +86,22 @@ class Mapper(object):
             digest.update(value.encode('utf-8'))
         return digest.hexdigest()
 
-    def compute_text(self, record):
-        text = []
-        for key, value in record.items():
-            if isinstance(value, six.string_types) and len(value.strip()) > 1:
-                text.append(value)
-            # TODO: latin transliteration
-        return text
-
     def to_index(self, record):
-        # TODO make sure record and properties is typecast to strings
+        text = set()
+        properties = self.compute_properties(record)
+
+        for value in properties.values() + record.values():
+            if isinstance(value, six.string_types) and len(value.strip()) > 1:
+                text.add(value)
+                text.add(latinize_text(value))
+
         return {
             'schema': self.schema.name,
             'schemata': list(self.schema.schemata),
             'dataset': self.query.dataset.name,
             'groups': self.query.dataset.groups,
-            'properties': self.compute_properties(record),
-            'text': self.compute_text(record)
+            'properties': properties,
+            'text': list(text)
         }
 
     def __repr__(self):

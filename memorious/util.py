@@ -2,10 +2,12 @@ import os
 import re
 import six
 import yaml
+from icu import Transliterator
 
 
 DATA_PAGE = 10000
 WS_PATTERN = re.compile('\s+')
+tr = Transliterator.createInstance('Any-Latin')
 
 
 def resolve_includes(file_path, data):
@@ -39,6 +41,7 @@ def load_config_file(file_path):
 
 
 def chunk_iter(iter, chunk_size):
+    """Turn an iterator into a set of smaller lists."""
     chunk = []
     for item in iter:
         chunk.append(item)
@@ -73,6 +76,11 @@ def clean_text(text):
     return text
 
 
+def latinize_text(text):
+    """Transliterate a piece of text into the latin alphabet."""
+    return tr.transliterate(text)
+
+
 def ensure_list(obj):
     """Make the returned object a list, otherwise wrap as single item."""
     if obj is None:
@@ -88,18 +96,6 @@ def dict_list(data, *keys):
         if key in data:
             return ensure_list(data[key])
     return []
-
-
-def chunk_iter(iterable, size):
-    """Turn an iterator into a set of smaller lists."""
-    chunk = []
-    for el in iterable:
-        chunk.append(el)
-        if len(chunk) >= size:
-            yield chunk
-            chunk = []
-    if len(chunk):
-        yield chunk
 
 
 def remove_nulls(data):
