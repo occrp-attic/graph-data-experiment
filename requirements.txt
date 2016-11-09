@@ -15,7 +15,7 @@ elasticsearch==2.3.0
 unidecode
 cssutils
 urllib3==1.17
-pycountry
+pycountry==16.11.8
 humanize
 dateparser
 celery==4.0.0
