@@ -4,7 +4,9 @@ COUNTRY_NAMES = {
     'ZZ': 'Global',
     'EU': 'European Union',
     'XK': 'Kosovo',
-    'YU': 'Yugoslavia'
+    'YUCS': 'Yugoslavia',
+    'CSXX': 'Serbia and Montenegro',
+    'SUHH': 'Soviet Union'
 }
 
 for country in pycountry.countries:

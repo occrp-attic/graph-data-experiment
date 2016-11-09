@@ -40,5 +40,23 @@ class Model(object):
                 return dataset
         raise NameError("No such dataset: %s" % name)
 
+    def merge_entity_schema(self, left, right):
+        if left == right:
+            return left
+        lefts = self.get_schema(Schema.ENTITY, left)
+        lefts = [s.name for s in lefts.schemata]
+        if right in lefts:
+            return left
+
+        rights = self.get_schema(Schema.ENTITY, right)
+        rights = [s.name for s in rights.schemata]
+        if left in rights:
+            return right
+
+        for left in lefts:
+            for right in rights:
+                if left == right:
+                    return left
+
     def __repr__(self):
         return '<Model(%r, %r)>' % (self.schemata, self.datasets)

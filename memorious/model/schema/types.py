@@ -77,6 +77,9 @@ class CountryProperty(StringProperty):
         value = super(CountryProperty, self).clean(value, prop, record)
         return countrynames.to_code(value) or value
 
+    def normalize_value(self, value, prop, record):
+        return [countrynames.to_code(value)]
+
 
 class AddressProperty(StringProperty):
     index_invert = 'addresses'

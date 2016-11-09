@@ -56,11 +56,10 @@ class Schema(object):
     @property
     def schemata(self):
         """Return the full inheritance chain."""
-        if not self.is_hidden:
-            yield self.name
+        yield self
         for base in self.extends:
-            for name in base.schemata:
-                yield name
+            for schema in base.schemata:
+                yield schema
 
     @property
     def properties(self):

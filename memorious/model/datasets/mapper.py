@@ -95,9 +95,14 @@ class Mapper(object):
                 text.add(value)
                 text.add(latinize_text(value))
 
+        schemata = []
+        for schema in self.schema.schemata:
+            if not schema.is_hidden:
+                schemata.append(schema.name)
+
         return {
             'schema': self.schema.name,
-            'schemata': list(self.schema.schemata),
+            'schemata': schemata,
             'dataset': self.query.dataset.name,
             'groups': self.query.dataset.groups,
             'properties': properties,
@@ -173,7 +178,7 @@ class LinkMapper(Mapper):
             'fingerprints': origin.get('fingerprints'),
         }
         data['text'].extend(remote.get('text', []))
-        data['remote'] = remote
+        data['remote'] = remote.get('id')
 
         # Generate a link ID
         digest = sha1()
