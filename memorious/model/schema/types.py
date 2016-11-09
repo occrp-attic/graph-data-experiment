@@ -87,27 +87,22 @@ class AddressProperty(StringProperty):
 
 class PhoneProperty(StringProperty):
     index_invert = 'phones'
-    FORMAT = phonenumbers.PhoneNumberFormat.E164
+    FORMAT = phonenumbers.PhoneNumberFormat.INTERNATIONAL
 
-    def normalize(self, values, prop, record):
-        countries = [prop.data.get('country')]
-        if countries[0] is None:
-            for prop in prop.mapper.properties:
-                if isinstance(prop.type, CountryProperty):
-                    pvalues = prop.get_values(record)
-                    countries.extend(prop.type.normalize(pvalues, record))
-
-        for value in values:
-            for country in countries:
-                try:
-                    num = phonenumbers.parse(value, country)
-                    if phonenumbers.is_possible_number(num):
-                        if phonenumbers.is_valid_number(num):
-                            num = phonenumbers.format_number(num, self.FORMAT)
-                            yield num
-                except NumberParseException:
-                    # TODO do we want to log this?
-                    pass
+    def clean(self, value, prop, record):
+        value = super(PhoneProperty, self).clean(value, prop, record)
+        if value is None:
+            return
+        try:
+            country = prop.data.get('country')
+            num = phonenumbers.parse(value, country)
+            if phonenumbers.is_possible_number(num):
+                # if phonenumbers.is_valid_number(num):
+                num = phonenumbers.format_number(num, self.FORMAT)
+                return num.replace(' ', '')
+        except NumberParseException:
+            pass
+        return value
 
 
 class EmailProperty(StringProperty):

@@ -41,11 +41,15 @@
       <a href="{{value}}">{{value | cleanurl}}</a>
     {% elif prop.type.name == 'country' %}
       {{value | country}}
+    {% elif prop.type.name == 'email' %}
+      {{value}}
+      {% if searches %}{{value_search('emails', value)}}{% endif %}
+    {% elif prop.type.name == 'phone' %}
+      {{value}}
+      {% if searches %}{{value_search('phones', value)}}{% endif %}
     {% elif prop.type.name == 'date' %}
       {{value | date}}
-      {% if searches %}
-        {{value_search('dates', value)}}
-      {% endif %}
+      {% if searches %}{{value_search('dates', value)}}{% endif %}
     {% else %}
       {{value}}
     {% endif %}
