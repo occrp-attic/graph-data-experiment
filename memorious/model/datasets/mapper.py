@@ -1,4 +1,5 @@
 import six
+import fingerprints
 from hashlib import sha1
 from pprint import pprint  # noqa
 
@@ -52,6 +53,7 @@ class Mapper(object):
         self.query = query
         self.data = data
         self.keys = dict_list(data, 'keys', 'key')
+        self.key_fingerprint = data.get('key_fingerprint', False)
 
         model = query.dataset.model
         self.schema = model.get_schema(self.section, data.get('schema'))
@@ -80,9 +82,13 @@ class Mapper(object):
         digest = sha1(self.query.dataset.name.encode('utf-8'))
         # digest.update(self.schema.name.encode('utf-8'))
         for key in self.keys:
-            value = clean_text(record.get(key))
+            value = record.get(key)
+            if self.key_fingerprint:
+                value = fingerprints.generate(value)
+            else:
+                value = clean_text(value)
             if value is None:
-                return
+                continue
             digest.update(value.encode('utf-8'))
         return digest.hexdigest()
 
