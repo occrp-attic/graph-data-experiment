@@ -1,3 +1,4 @@
+import time
 import logging
 from elasticsearch import ElasticsearchException
 
@@ -37,7 +38,8 @@ def load_records(task, dataset_name, query_idx, records):
     try:
         index_items(items)
     except ElasticsearchException as exc:
-        raise task.retry(exc=exc, countdown=60, max_retries=5)
+        time.sleep(30)
+        raise task.retry(exc=exc, countdown=30, max_retries=5)
 
     log.info("[%r] Indexed %s records as %s documents...",
              dataset_name, len(records), len(items))
