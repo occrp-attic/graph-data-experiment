@@ -17,11 +17,13 @@
 
 
 {% macro value_search(field, value) %}
-  {% set query = field + ':"' + value + '"' %}
-  <a href="{{url_for('base.search', q=query)}}" data-toggle="tooltip"
-     data-placement="top" title="Search similar entities">
-    <i class="fa fa-fw fa-search" aria-hidden="true"></i>
-  </a>
+  {% if value %}
+    {% set query = field + ':"' + value + '"' %}
+    <a href="{{url_for('base.search', q=query)}}" data-toggle="tooltip"
+       data-placement="top" title="Search similar entities">
+      <i class="fa fa-fw fa-search" aria-hidden="true"></i>
+    </a>
+  {% endif %}
 {% endmacro %}
 
 {% macro render_value(value, prop, searches=False) %}

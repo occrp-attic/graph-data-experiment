@@ -113,32 +113,28 @@
 
         <table class="table table-condensed">
           <tr>
-            <th>Type</th>
-            <th>Entity</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Details</th>
+            <th width="15%">Type</th>
+            <th colspan="2">Entity</th>
           </tr>
           {% for link in links %}
             <tr>
-              <td>
-                {{link.label}}
-              </td>
-              <td>
+              <td>{{link.label}}</td>
+              <td colspan="2">
                 {{ macros.entity_icon(link.remote_schema) }}
                 <a href="{{url_for('base.entity', entity_id=link.remote.id)}}">
                   {{link.remote.name}}
                 </a>
               </td>
-              <td>
-                {{ macros.render_values(link.properties.startDate, link.schema.get('startDate')) }}
-              </td>
-              <td>
-                {{ macros.render_values(link.properties.endDate, link.schema.get('endDate')) }}
-              </td>
-              <td>
-                {{ macros.render_values(link.properties.summary, link.schema.get('summary')) }}
-              </td>
+            </tr>
+            {% for prop, values in link.list_properties() %}
+              <tr>
+                <td></td>
+                <th width="30%">{{prop.label}}</th>
+                <td>
+                  {{macros.render_values(values, prop, searches=True)}}
+                </td>
+              </tr>
+            {% endfor %}
             </tr>
           {% endfor %}
         </table>

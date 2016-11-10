@@ -42,7 +42,8 @@ def entity(entity_id):
     duplicates = search_duplicates(entity.id, entity.fingerprints, query,
                                    request.auth)
     # load links
-    query = Query(request.args, prefix='links_', path=request.path)
+    query = Query(request.args, prefix='links_', path=request.path,
+                  limit=10)
     query.add_facet('schemata', 'Types', link_schema_label)
     query.add_facet('remote.countries', 'Countries', country)
     links = search_links(entity, query, request.auth)
