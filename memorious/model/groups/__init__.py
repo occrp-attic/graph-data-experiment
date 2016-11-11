@@ -8,6 +8,7 @@ and each dataset specifies the groups which shall have read access to it.
 Additionally, two pseudo-group exists: "Anybody" for all site visitors, and
 "Users" for those who have signed into the site.
 """
+from memorious.model.datasets import Dataset
 
 
 class Group(object):
@@ -66,6 +67,14 @@ class Auth(object):
         for group in model.groups + [UsersGroup(), AnybodyGroup()]:
             if group.is_member(user):
                 self.groups.append(group.name)
+
+    def has_access(self, dataset):
+        if not isinstance(dataset, Dataset):
+            dataset = self.model.get_dataset(dataset)
+        for group in dataset.groups:
+            if group in self.groups:
+                return True
+        return False
 
     def __repr__(self):
         return '<Auth(%r, %r)>' % (self.user, self.groups)
