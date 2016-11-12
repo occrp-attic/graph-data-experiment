@@ -124,6 +124,7 @@ class EmailProperty(StringProperty):
         parsed = address.parse(value)
         if parsed is not None:
             return [parsed.address]
+        return []
 
 
 class IdentiferProperty(StringProperty):
@@ -131,13 +132,10 @@ class IdentiferProperty(StringProperty):
     clean_re = re.compile('[^a-zA-Z0-9]*')
 
     def normalize_value(self, value, prop, record):
-        scheme = prop.data.get('scheme')
-        if scheme is None:
-            raise TypeError("No scheme given for: %s", prop)
         value = self.clean_re.sub('', value).upper()
         if not len(value):
             return []
-        return ['%s:%s' % (scheme, value)]
+        return [value]
 
 
 def resolve_type(name):

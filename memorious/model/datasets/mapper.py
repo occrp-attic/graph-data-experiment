@@ -81,6 +81,7 @@ class Mapper(object):
             return None
         digest = sha1(self.query.dataset.name.encode('utf-8'))
         # digest.update(self.schema.name.encode('utf-8'))
+        has_key = False
         for key in self.keys:
             value = record.get(key)
             if self.key_fingerprint:
@@ -90,7 +91,9 @@ class Mapper(object):
             if value is None:
                 continue
             digest.update(value.encode('utf-8'))
-        return digest.hexdigest()
+            has_key = True
+        if has_key:
+            return digest.hexdigest()
 
     def to_index(self, record):
         text = set()
