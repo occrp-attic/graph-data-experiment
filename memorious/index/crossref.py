@@ -6,6 +6,7 @@ from elasticsearch.helpers import bulk, scan
 from memorious.core import es, es_index, model
 from memorious.model import Schema
 from memorious.util import chunk_iter
+from memorious.index.results import CrossrefResult
 
 log = logging.getLogger(__name__)
 CHUNK_SIZE = 5000
@@ -42,7 +43,9 @@ def _update_entities(dataset_name=None):
     for chunk in chunk_iter(fps, CHUNK_SIZE):
         queries = []
         for (fp, dataset) in chunk:
-            doc_id = sha1(fp).hexdigest()
+            if fp is None or not len(fp):
+                continue
+            doc_id = sha1(fp.encode('utf-8')).hexdigest()
             queries.append({
                 '_id': doc_id,
                 '_type': CROSSREF_TYPE
@@ -120,4 +123,5 @@ def search_crossref_entities(datasets, query):
         '_source': ['fingerprint']
     }
     result = es.search(index=es_index, doc_type=CROSSREF_TYPE, body=q)
-    return result
+    sub_results = []
+    return CrossrefResult(query, result, sub_results)

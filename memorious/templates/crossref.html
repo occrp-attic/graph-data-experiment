@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}{{dataset.label}} / {{other.label}} - Cross-Referencing{% endblock %}
+
+{% block content %}
+  <div class="row header">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <h2>
+        <i class="fa fa-fw fa-link"></i>
+        Cross-Reference:
+        {{ dataset.label }}
+        &mdash; 
+        {{ other.label }}
+      </h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <p>
+        Entities (such as companies and people) that are mentioned both in
+        {{macros.dataset_link(dataset)}} and {{macros.dataset_link(other)}}.
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-condensed">
+        {% for match in matches %}
+          <tr>
+            <td>{{match | tojson(indent=2)}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endblock %}

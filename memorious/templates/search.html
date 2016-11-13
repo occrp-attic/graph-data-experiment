@@ -24,13 +24,13 @@
           {% for result in results %}
             <tr>
               <td width="1%">{{ macros.entity_icon(result.schema) }}</td>
-              <td>
+              <td width="50%">
                 <a href="{{url_for('base.entity', entity_id=result.id)}}">
                   {{result.name}}
                 </a>
               </td>
               <td>
-                {{result.dataset.label}}
+                {{macros.dataset_link(result.dataset)}}
               </td>
               <td>
                 {% for country in result.data.countries %}

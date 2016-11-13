@@ -190,3 +190,15 @@ class ResultSet(object):
 
     def __repr__(self):
         return '<Result(%r)>' % (self.total)
+
+
+class CrossrefResult(ResultSet):
+
+    def __init__(self, query, results, sub_results):
+        super(CrossrefResult, self).__init__(query, results)
+        self.sub_results = sub_results
+
+    def __iter__(self):
+        yield 'hello'
+        yield 'hello 2'
+        yield 'hello 3'

@@ -5,6 +5,7 @@ Flask-Assets==0.12
 Flask-OAuthlib==0.9.3
 sqlalchemy
 psycopg2
+https://github.com/pudo/normality/tarball/master
 https://github.com/pudo/fingerprints/tarball/master
 https://github.com/occrp/countrynames/tarball/master
 pyyaml

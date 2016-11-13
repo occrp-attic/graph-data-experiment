@@ -16,6 +16,14 @@
 {% endmacro %}
 
 
+{% macro dataset_link(dataset) %}
+  <i class="fa fa-fw fa-database"></i>
+  <a href="{{url_for('datasets.view', dataset=dataset.name)}}">
+    {{ dataset.label }}
+  </a>
+{% endmacro %}
+
+
 {% macro value_search(field, value) %}
   {% if value %}
     {% set query = field + ':"' + value + '"' %}

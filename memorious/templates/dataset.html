@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}{{dataset.label}} - Dataset{% endblock %}
+
+{% block content %}
+  <div class="row header">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <h2>
+        <i class="fa fa-fw fa-database"></i>
+        {{ dataset.label }}
+        <small>
+          Dataset
+        </small>
+      </h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <p>
+        {% if dataset.info_url %}
+          <i class="fa fa-globe" aria-hidden="true"></i>
+          <a href="{{dataset.info_url}}" target="_blank">
+            {{dataset.info_url | cleanurl}}
+          </a>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  {% if crossrefs %}
+    {{ macros.subheader("Cross-referencing") }}    
+    <div class="row">
+      <div class="col-md-3">
+      </div>
+      <div class="col-md-9">
+        <p>
+          People and companies mentioned in {{dataset.label}} also show up in these
+          other datasets, where more information might be available.
+        </p>
+
+        <table class="table table-condensed">
+          <tr>
+            <th>Dataset</th>
+            <th class="numeric">
+              Cross-reference matches
+            </th>
+            <th></th>
+          </tr>
+          {% for (other, count) in crossrefs %}
+            <tr>
+              <td>{{macros.dataset_link(other)}}</td>
+              <td class="numeric">{{count | intcomma}}</td>
+              <td>
+                <a href="{{url_for('datasets.crossref', dataset=dataset.name, other=other.name)}}">
+                  Details &raquo;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
