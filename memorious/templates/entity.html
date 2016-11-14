@@ -59,18 +59,26 @@
         <table class="table table-condensed">
           <tr>
             <th>Entity</th>
+            <th>Birth/Inc Date</th>
+            <th>Countries</th>
             <th>Dataset</th>
           </tr>
           {% for duplicate in duplicates %}
             <tr>
               <td>
-                {{ macros.entity_icon(duplicate.schema) }}
-                <a href="{{url_for('base.entity', entity_id=duplicate.id)}}">
-                  {{duplicate.name}}
-                </a>
+                {{ macros.entity_link(duplicate) }}
               </td>
               <td>
-                {{ duplicate.dataset.label }}
+                {{ macros.render_values(duplicate.get_values('birthDate'), duplicate.get_property('birthDate')) }}
+                {{ macros.render_values(duplicate.get_values('incorporationDate'), duplicate.get_property('incorporationDate')) }}
+              </td>
+              <td>
+                {% for country in duplicate.data.countries %}
+                  {{ country }} {% if not loop.last %}&middot;{% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                {{macros.dataset_link(duplicate.dataset)}}
               </td>
             </tr>
           {% endfor %}

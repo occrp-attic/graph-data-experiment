@@ -14,7 +14,7 @@ class ResultDocument(object):
         self.document = document
         self.data = document.get('_source', document)
         self.id = document.get('_id')
-        self.properties = self.data.get('properties')
+        self.properties = self.data.get('properties', {})
         self.schema = model.get_schema(document.get('_type'),
                                        self.data.get('schema'))
         self.dataset = model.get_dataset(self.data.get('dataset'))
@@ -27,9 +27,21 @@ class ResultDocument(object):
             except ValueError as ve:
                 log.info("Invalid property: %s", ve)
                 continue
+            if values is None:
+                values = []
             if not prop.is_hidden and len(values):
                 listed.append((prop, values))
         return sorted(listed, key=lambda (p, v): p.label)
+
+    def get_property(self, name):
+        for (prop, values) in self.list_properties():
+            if prop.name == name:
+                return prop
+
+    def get_values(self, name):
+        for (prop, values) in self.list_properties():
+            if prop.name == name:
+                return values
 
     def has_properties(self):
         return len(list(self.list_properties())) > 0
@@ -194,11 +206,19 @@ class ResultSet(object):
 
 class CrossrefResult(ResultSet):
 
-    def __init__(self, query, results, sub_results):
+    def __init__(self, query, results, datasets, entities):
         super(CrossrefResult, self).__init__(query, results)
-        self.sub_results = sub_results
+        self.datasets = datasets
+        self.entities = entities
 
     def __iter__(self):
-        yield 'hello'
-        yield 'hello 2'
-        yield 'hello 3'
+        for i, crossref in enumerate(self.hits.get('hits', [])):
+            data = {}
+            for j, ds in enumerate(self.datasets):
+                idx = i * len(self.datasets) + j
+                hits = self.entities['responses'][idx]['hits']
+                entities = []
+                for ent in hits['hits']:
+                    entities.append(EntityResult(ent))
+                data[ds] = {'entities': entities, 'total': hits['total']}
+            yield data

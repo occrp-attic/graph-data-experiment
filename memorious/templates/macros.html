@@ -24,6 +24,14 @@
 {% endmacro %}
 
 
+{% macro entity_link(entity) %}
+  {{entity_icon(entity.schema)}}
+  <a href="{{url_for('base.entity', entity_id=entity.id)}}">
+    {{ entity.name }}
+  </a>
+{% endmacro %}
+
+
 {% macro value_search(field, value) %}
   {% if value %}
     {% set query = field + ':"' + value + '"' %}
@@ -68,10 +76,12 @@
 
 
 {% macro render_values(values, prop, searches=False) %}
-  {% for value in values %}
-    {{render_value(value, prop, searches=searches)}}
-    {% if not loop.last %} &middot; {% endif %}
-  {% endfor %}
+  {% if values %}
+    {% for value in values %}
+      {{render_value(value, prop, searches=searches)}}
+      {% if not loop.last %} &middot; {% endif %}
+    {% endfor %}
+  {% endif %}
 {% endmacro %}
 
 

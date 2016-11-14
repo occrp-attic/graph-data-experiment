@@ -1,3 +1,4 @@
+import json
 import logging
 from pprint import pprint  # noqa
 from hashlib import sha1
@@ -123,5 +124,20 @@ def search_crossref_entities(datasets, query):
         '_source': ['fingerprint']
     }
     result = es.search(index=es_index, doc_type=CROSSREF_TYPE, body=q)
-    sub_results = []
-    return CrossrefResult(query, result, sub_results)
+    queries = []
+    for res in result.get('hits', {}).get('hits', {}):
+        fp = res.get('_source', {}).get('fingerprint')
+        for dataset in datasets:
+            q = {
+                'bool': {
+                    'must': [
+                        {'term': {'dataset': dataset}},
+                        {'term': {'fingerprints': fp}}
+                    ]
+                }
+            }
+            queries.append({})
+            queries.append({'query': q, 'size': 5})
+    queries = '\n'.join([json.dumps(sq) for sq in queries])
+    entities = es.msearch(index=es_index, doc_type=Schema.ENTITY, body=queries)
+    return CrossrefResult(query, result, datasets, entities)

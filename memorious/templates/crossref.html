@@ -27,9 +27,40 @@
   <div class="row">
     <div class="col-md-12">
       <table class="table table-condensed">
+        <tr>
+          <th width="50%" colspan="3">{{dataset.label}}</th>
+          <th width="50%" colspan="3">{{other.label}}</th>
+        </tr>
         {% for match in matches %}
           <tr>
-            <td>{{match | tojson(indent=2)}}</td>
+            {% for entity in match[dataset.name].entities %}
+              <td>
+                {{ macros.entity_link(entity) }}
+              </td>
+              <td>
+                {{ macros.render_values(entity.get_values('birthDate'), entity.get_property('birthDate')) }}
+                {{ macros.render_values(entity.get_values('incorporationDate'), entity.get_property('incorporationDate')) }}
+              </td>
+              <td>
+                {% for country in entity.data.countries %}
+                  {{ country }} {% if not loop.last %}&middot;{% endif %}
+                {% endfor %}
+              </td>
+            {% endfor %}
+            {% for entity in match[other.name].entities %}
+              <td>
+                {{ macros.entity_link(entity) }}
+              </td>
+              <td>
+                {{ macros.render_values(entity.get_values('birthDate'), entity.get_property('birthDate')) }}
+                {{ macros.render_values(entity.get_values('incorporationDate'), entity.get_property('incorporationDate')) }}
+              </td>
+              <td>
+                {% for country in entity.data.countries %}
+                  {{ country }} {% if not loop.last %}&middot;{% endif %}
+                {% endfor %}
+              </td>
+            {% endfor %}
           </tr>
         {% endfor %}
       </table>
