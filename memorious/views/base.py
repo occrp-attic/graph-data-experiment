@@ -14,16 +14,24 @@ log = logging.getLogger(__name__)
 
 @blueprint.route('/')
 def index():
-    return render_template("home.html")
+    query = Query({}, path=request.path, limit=0)
+    query.add_facet('dataset', 'Dataset', dataset_label)
+    stats = search_entities(query, request.auth)
+    return render_template("home.html", stats=stats)
+
+
+@blueprint.app_errorhandler(403)
+def forbidden(e):
+    return render_template('forbidden.html'), 404
 
 
 @blueprint.route('/search')
 def search():
     query = Query(request.args, path=request.path)
+    query.add_facet('dataset', 'Dataset', dataset_label)
+    query.add_facet('countries', 'Countries', country)
     query.add_facet('schemata', 'Types', entity_schema_label,
                     entity_schema_icon)
-    query.add_facet('countries', 'Countries', country)
-    query.add_facet('dataset', 'Dataset', dataset_label)
     results = search_entities(query, request.auth)
     return render_template("search.html", query=query, results=results)
 

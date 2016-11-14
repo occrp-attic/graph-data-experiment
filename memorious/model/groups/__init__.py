@@ -68,6 +68,10 @@ class Auth(object):
             if group.is_member(user):
                 self.groups.append(group.name)
 
+    @property
+    def logged_in(self):
+        return self.user is not None
+
     def has_access(self, dataset):
         if not isinstance(dataset, Dataset):
             dataset = self.model.get_dataset(dataset)

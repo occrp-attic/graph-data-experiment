@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}Access denied{% endblock %}
+
+{% block content %} 
+  <div class="row header">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <h2>
+        <i class="fa fa-fw fa-lock"></i>
+        Access denied
+        <small>Error 403</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-9">
+      <div class="alert alert-danger">
+        <p>
+          You don't have permission to access the page you've requested.
+          {% if not request.auth.logged_in %}
+            Please <a class="alert-link" href="{{url_for('auth.login', next=request.url)}}">log in</a> to continue.
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

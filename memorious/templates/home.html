@@ -7,12 +7,32 @@
     <div class="col-md-3"></div>
     <div class="col-md-9">
       <p>
-        This is an experimental search service for structured corporate and
-        property records at OCCRP.
+        This is an experimental search service for {{stats.total | intcomma}} structured
+        corporate and property records at OCCRP.
       </p>
       <p>
         Kindly direct your comments to <strong>tech@occrp.org</strong>.
       </p>
+
+      {% for facet in stats.facets %}
+        <table class="table table-condensed">
+          {% for bucket in facet.buckets %}
+            <tr>
+              <td>
+                <i class="fa fa-fw fa-database"></i>
+                <a href="{{url_for('datasets.view', dataset=bucket.key)}}">
+                  {{bucket.label}}
+                </a>
+              </td>
+              <td class="numeric">
+                <a href="{{url_for('base.search', dataset=bucket.key)}}">
+                  {{bucket.count | intcomma}}
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endfor %}
     </div>
   </div>
 {% endblock %}
